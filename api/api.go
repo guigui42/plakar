@@ -11,6 +11,7 @@ import (
 	"github.com/PlakarKorp/kloset/repository"
 	"github.com/PlakarKorp/kloset/snapshot"
 	"github.com/PlakarKorp/kloset/storage"
+	"github.com/PlakarKorp/plakar/pvr"
 	"github.com/PlakarKorp/plakar/utils"
 )
 
@@ -133,13 +134,20 @@ func apiInfo(w http.ResponseWriter, r *http.Request) error {
 	return json.NewEncoder(w).Encode(res)
 }
 
-func SetupRoutes(server *http.ServeMux, repo *repository.Repository, token string) {
+func SetupRoutes(server *http.ServeMux, repo *repository.Repository, token string) error {
 	lstore = repo.Store()
 	lconfig = repo.Configuration()
 	lrepository = repo
 
 	authToken := TokenAuthMiddleware(token)
 	urlSigner := NewSnapshotReaderURLSigner(token)
+
+	pvr, err := pvr.New()
+	if err != nil {
+		return err
+	}
+
+	visualizationApi := NewVisualizationAPI(pvr)
 
 	// Catch all API endpoint, called if no more specific API endpoint is found
 	server.Handle("/api/", JSONAPIView(func(w http.ResponseWriter, r *http.Request) error {
@@ -170,6 +178,27 @@ func SetupRoutes(server *http.ServeMux, repo *repository.Repository, token strin
 	server.Handle("GET /api/repository/states", authToken(JSONAPIView(repositoryStates)))
 	server.Handle("GET /api/repository/state/{state}", authToken(JSONAPIView(repositoryState)))
 
+	server.Handle("GET /api/visualizations/available", authToken(JSONAPIView(visualizationApi.GetAvailableVisualizations)))
+	server.Handle("GET /api/visualizations", authToken(JSONAPIView(visualizationApi.ListRunningVisualizations)))
+	server.Handle("POST /api/visualizations", authToken(JSONAPIView(visualizationApi.StartVisualization)))
+
+	// GET /api/pvr/{id}: get the status of a specific visualization, potentially returning several containers
+
+	// GET /api/pvr: list all the running visualizations
+	// POST /api/pvr: start a new visualization
+	/*
+		 params:
+		 	- type
+			- snapshot
+			- path
+	*/
+	// GET /api/pvr/{id}: get the status of a specific visualization, potentially returning several containers
+	// DELETE /api/pvr/{id}: stop a specific visualization
+	// GET /api/pvr/{id}/attach: attach to a specific visualization with a websocket
+
+	// server.Handle("POST /api/repository/visualizations/{visualization}", authToken(JSONAPIView(visualizationApi.Start)))
+	// server.Handle("GET /api/repository/visualizations/ws", authToken(JSONAPIView(visualizationApi.WebSocket)))
+
 	server.Handle("GET /api/snapshot/{snapshot}", authToken(JSONAPIView(snapshotHeader)))
 	server.Handle("GET /api/snapshot/reader/{snapshot_path...}", urlSigner.VerifyMiddleware(APIView(snapshotReader)))
 	server.Handle("POST /api/snapshot/reader-sign-url/{snapshot_path...}", authToken(JSONAPIView(urlSigner.Sign)))
@@ -182,4 +211,5 @@ func SetupRoutes(server *http.ServeMux, repo *repository.Repository, token strin
 
 	server.Handle("POST /api/snapshot/vfs/downloader/{snapshot_path...}", authToken(JSONAPIView(snapshotVFSDownloader)))
 	server.Handle("GET /api/snapshot/vfs/downloader-sign-url/{id}", JSONAPIView(snapshotVFSDownloaderSigned))
+	return nil
 }

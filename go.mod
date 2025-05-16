@@ -10,7 +10,7 @@ require (
 	github.com/charmbracelet/glamour v0.9.1
 	github.com/charmbracelet/lipgloss v1.1.0
 	github.com/cockroachdb/pebble/v2 v2.0.3
-	github.com/creack/pty v1.1.9
+	github.com/creack/pty v1.1.24
 	github.com/denisbrodbeck/machineid v1.0.1
 	github.com/dustin/go-humanize v1.0.1
 	github.com/go-playground/validator/v10 v10.25.0
@@ -18,6 +18,7 @@ require (
 	github.com/gobwas/glob v0.2.3
 	github.com/golang-jwt/jwt/v5 v5.2.2
 	github.com/google/uuid v1.6.0
+	github.com/gorilla/websocket v1.5.3
 	github.com/johannesboyne/gofakes3 v0.0.0-20250106100439-5c39aecd6999
 	github.com/kevinburke/ssh_config v1.2.0
 	github.com/minio/minio-go/v7 v7.0.89

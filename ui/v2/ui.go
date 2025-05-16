@@ -42,7 +42,10 @@ var content embed.FS
 
 func Ui(repo *repository.Repository, addr string, opts *UiOptions) error {
 	server := http.NewServeMux()
-	api.SetupRoutes(server, repo, opts.Token)
+
+	if err := api.SetupRoutes(server, repo, opts.Token); err != nil {
+		return err
+	}
 
 	// Serve files from the ./frontend directory
 	server.HandleFunc("/{path...}", func(w http.ResponseWriter, r *http.Request) {

@@ -26,6 +26,7 @@ import (
 	"github.com/PlakarKorp/kloset/appcontext"
 	"github.com/PlakarKorp/kloset/repository"
 	"github.com/PlakarKorp/plakar/subcommands"
+	"github.com/PlakarKorp/plakar/subcommands/server"
 	v2 "github.com/PlakarKorp/plakar/ui/v2"
 	"github.com/google/uuid"
 )
@@ -72,6 +73,16 @@ func (cmd *Ui) Execute(ctx *appcontext.AppContext, repo *repository.Repository) 
 	if !cmd.NoAuth {
 		ui_opts.Token = uuid.NewString()
 	}
+
+	// Run Plakar HTTP server in a goroutine. Necessary for visualization
+	// XXX: listen on a random port instead, or even on a UNIX socket
+	go func() {
+		server := &server.Server{
+			ListenAddr: "127.0.0.1:9888",
+			NoDelete:   true,
+		}
+		server.Execute(ctx, repo)
+	}()
 
 	err := v2.Ui(repo, cmd.Addr, &ui_opts)
 	if err != nil {
