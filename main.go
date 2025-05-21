@@ -338,18 +338,22 @@ func EntryPoint() int {
 			if def != "" {
 				repositoryPath = "@" + def
 			} else {
-				repositoryPath = filepath.Join(ctx.HomeDir, ".plakar")
+				repositoryPath = "fs:" + filepath.Join(ctx.HomeDir, ".plakar")
 			}
 		}
 
 		args = flag.Args()
 	}
 
+	log.Println("here the repository path is", repositoryPath)
+
 	storeConfig, err := ctx.Config.GetRepository(repositoryPath)
 	if err != nil {
 		fmt.Fprintf(os.Stderr, "%s: %s\n", flag.CommandLine.Name(), err)
 		return 1
 	}
+
+	log.Println("after getrepository the config is", storeConfig)
 
 	cmd, name, args := subcommands.Lookup(args)
 	if cmd == nil {

@@ -21,7 +21,7 @@ import (
 	"flag"
 	"fmt"
 	"io"
-	"log/syslog"
+	"log"
 	"net"
 	"net/http"
 	"os"
@@ -64,31 +64,6 @@ func init() {
 
 var agentContextSingleton *AgentContext
 
-func daemonize(argv []string) error {
-	binary, err := os.Executable()
-	if err != nil {
-		return err
-	}
-
-	procAttr := syscall.ProcAttr{}
-	procAttr.Files = []uintptr{
-		uintptr(syscall.Stdin),
-		uintptr(syscall.Stdout),
-		uintptr(syscall.Stderr),
-	}
-	procAttr.Env = append(os.Environ(),
-		"REEXEC=1",
-	)
-
-	pid, err := syscall.ForkExec(binary, argv, &procAttr)
-	if err != nil {
-		return err
-	}
-	fmt.Printf("agent started with pid=%d\n", pid)
-	os.Exit(0)
-	return nil
-}
-
 func (cmd *Agent) Parse(ctx *appcontext.AppContext, args []string) error {
 	var opt_foreground bool
 	var opt_logfile string
@@ -120,11 +95,11 @@ func (cmd *Agent) Parse(ctx *appcontext.AppContext, args []string) error {
 		}
 		ctx.GetLogger().SetOutput(f)
 	} else if !opt_foreground {
-		w, err := syslog.New(syslog.LOG_INFO|syslog.LOG_USER, "plakar")
-		if err != nil {
-			return err
-		}
-		ctx.GetLogger().SetSyslogOutput(w)
+		// w, err := syslog.New(syslog.LOG_INFO|syslog.LOG_USER, "plakar")
+		// if err != nil {
+		// 	return err
+		// }
+		// ctx.GetLogger().SetSyslogOutput(w)
 	}
 
 	cmd.socketPath = filepath.Join(ctx.CacheDir, "agent.sock")
@@ -168,7 +143,8 @@ func (cmd *AgentStop) Parse(ctx *appcontext.AppContext, args []string) error {
 }
 
 func (cmd *AgentStop) Execute(ctx *appcontext.AppContext, repo *repository.Repository) (int, error) {
-	syscall.Kill(os.Getpid(), syscall.SIGINT)
+	//syscall.Kill(os.Getpid(), syscall.SIGINT)
+	log.Println("stopping...")
 	return 0, nil
 }
 
