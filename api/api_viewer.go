@@ -4,12 +4,12 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-
-	"github.com/gorilla/websocket"
+	"os"
 
 	"github.com/PlakarKorp/kloset/appcontext"
 	"github.com/PlakarKorp/kloset/repository"
 	"github.com/PlakarKorp/plakar/viewers"
+	"github.com/gorilla/websocket"
 )
 
 type ViewerAPI struct {
@@ -166,10 +166,11 @@ func (api *ViewerAPI) StartViewer(w http.ResponseWriter, r *http.Request) error 
 
 type WebSocketRequest struct {
 	Viewer string `json:"viewer"` // Viewer ID, returned by StartViewer
-	// XXX: add token
+	// XXX: add token to authenticate the user
 }
 
-func (api *ViewerAPI) WebSocket(w http.ResponseWriter, r *http.Request) error {
+func (api *ViewerAPI) WebSocket(w http.ResponseWriter, r *http.Request) {
+	fmt.Printf("in websocket\n")
 	upgrader := websocket.Upgrader{
 		CheckOrigin: func(r *http.Request) bool {
 			return true
@@ -177,27 +178,40 @@ func (api *ViewerAPI) WebSocket(w http.ResponseWriter, r *http.Request) error {
 	}
 	ws, err := upgrader.Upgrade(w, r, nil)
 	if err != nil {
-		return fmt.Errorf("failed to upgrade connection to WebSocket: %w", err)
+		err := fmt.Errorf("failed to upgrade connection to WebSocket: %w", err)
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		return
 	}
 	defer ws.Close()
 
 	msgType, message, err := ws.ReadMessage()
 	if err != nil {
-		return fmt.Errorf("failed to read message: %w", err)
+		err := fmt.Errorf("failed to read message: %w", err)
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		return
 	}
 
 	if msgType != websocket.TextMessage {
-		return fmt.Errorf("expected text message, got %v", msgType)
+		err := fmt.Errorf("expected text message, got %v", msgType)
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		return
 	}
 
 	request := WebSocketRequest{}
 	if err := json.Unmarshal(message, &request); err != nil {
-		return fmt.Errorf("failed to decode request body: %w", err)
+		err := fmt.Errorf("failed to decode request body: %w", err)
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		return
 	}
 
 	if request.Viewer == "" {
-		return fmt.Errorf("viewer is required")
+		err := fmt.Errorf("viewer is required")
+		fmt.Fprintf(os.Stderr, "error: %v\n", err)
+		return
 	}
+
+	// todo: find the instance of docker compose
+	// call attach
 
 	// cmd := exec.Command("docker", "run", "--rm", "--privileged", "-ti", "test", "-host", "http://host.docker.internal:9888", "-snapshot", request.Snapshot, "-path", request.Path)
 	// ptmx, err := pty.Start(cmd)
@@ -244,5 +258,5 @@ func (api *ViewerAPI) WebSocket(w http.ResponseWriter, r *http.Request) error {
 
 	// cmd.Wait()
 
-	return nil
+	// return nil
 }

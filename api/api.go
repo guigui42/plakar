@@ -175,7 +175,7 @@ func SetupRoutes(ctx *appcontext.AppContext, server *http.ServeMux, repo *reposi
 
 	server.Handle("GET /api/viewers/available", authToken(JSONAPIView(viewersApi.GetAvailableViewers)))
 	server.Handle("POST /api/viewers/start", authToken(JSONAPIView(viewersApi.StartViewer)))
-	server.Handle("GET /api/viewers/ws", authToken(JSONAPIView(viewersApi.WebSocket)))
+	server.Handle("GET /api/viewers/ws", http.HandlerFunc(viewersApi.WebSocket))
 
 	server.Handle("GET /api/snapshot/{snapshot}", authToken(JSONAPIView(snapshotHeader)))
 	server.Handle("GET /api/snapshot/reader/{snapshot_path...}", urlSigner.VerifyMiddleware(APIView(snapshotReader)))
