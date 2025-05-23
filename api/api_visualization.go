@@ -10,17 +10,20 @@ import (
 	"github.com/creack/pty"
 	"github.com/gorilla/websocket"
 
-	"github.com/PlakarKorp/plakar/pvr"
+	"github.com/PlakarKorp/kloset/appcontext"
+	"github.com/PlakarKorp/kloset/repository"
 	"github.com/PlakarKorp/plakar/viewers"
 )
 
 type VisualizationAPI struct {
-	pvr *pvr.PVR
+	ctx  *appcontext.AppContext
+	repo *repository.Repository
 }
 
-func NewVisualizationAPI(pvr *pvr.PVR) *VisualizationAPI {
+func NewVisualizationAPI(ctx *appcontext.AppContext, repo *repository.Repository) *VisualizationAPI {
 	return &VisualizationAPI{
-		pvr: pvr,
+		ctx,
+		repo,
 	}
 }
 
@@ -145,9 +148,13 @@ func (api *VisualizationAPI) StartVisualization(w http.ResponseWriter, r *http.R
 		}
 	}
 
-	runner, err := viewers.NewRunner(viewer)
+	runner, err := viewers.NewRunner(api.repo, viewer)
 	if err != nil {
 		return fmt.Errorf("failed to create runner: %w", err)
+	}
+
+	if err := runner.Run(api.ctx); err != nil {
+		return err
 	}
 
 	return json.NewEncoder(w).Encode(StartVisualizationResponse{

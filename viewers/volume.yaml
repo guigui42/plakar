@@ -1,0 +1,5 @@
+volumes:
+  snapshot:
+    driver: brmzkw/kloset
+    driver_opts:
+      host: __PLAKAR_SERVER__

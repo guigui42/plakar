@@ -3,7 +3,7 @@ package viewers
 import _ "embed"
 
 //go:embed terminal.yaml
-var compose string
+var terminalCompose string
 
 type Terminal struct {
 }
@@ -13,7 +13,7 @@ func NewTerminal() *Terminal {
 }
 
 func (t *Terminal) GetCompose() string {
-	return compose
+	return terminalCompose
 }
 
 func (t *Terminal) Attach() string {

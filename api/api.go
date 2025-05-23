@@ -8,10 +8,10 @@ import (
 	"log"
 	"net/http"
 
+	"github.com/PlakarKorp/kloset/appcontext"
 	"github.com/PlakarKorp/kloset/repository"
 	"github.com/PlakarKorp/kloset/snapshot"
 	"github.com/PlakarKorp/kloset/storage"
-	"github.com/PlakarKorp/plakar/pvr"
 	"github.com/PlakarKorp/plakar/utils"
 )
 
@@ -134,7 +134,7 @@ func apiInfo(w http.ResponseWriter, r *http.Request) error {
 	return json.NewEncoder(w).Encode(res)
 }
 
-func SetupRoutes(server *http.ServeMux, repo *repository.Repository, token string) error {
+func SetupRoutes(ctx *appcontext.AppContext, server *http.ServeMux, repo *repository.Repository, token string) error {
 	lstore = repo.Store()
 	lconfig = repo.Configuration()
 	lrepository = repo
@@ -142,12 +142,7 @@ func SetupRoutes(server *http.ServeMux, repo *repository.Repository, token strin
 	authToken := TokenAuthMiddleware(token)
 	urlSigner := NewSnapshotReaderURLSigner(token)
 
-	pvr, err := pvr.New()
-	if err != nil {
-		return err
-	}
-
-	visualizationApi := NewVisualizationAPI(pvr)
+	visualizationApi := NewVisualizationAPI(ctx, repo)
 
 	// Catch all API endpoint, called if no more specific API endpoint is found
 	server.Handle("/api/", JSONAPIView(func(w http.ResponseWriter, r *http.Request) error {

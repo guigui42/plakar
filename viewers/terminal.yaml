@@ -1,7 +1,7 @@
 services:
   app:
-    # volumes:
-    # - snapshot:/data
+    volumes:
+      - snapshot:/data
     ports:
       - "80"
     image: "nginx"

@@ -25,6 +25,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/PlakarKorp/kloset/appcontext"
 	"github.com/PlakarKorp/kloset/repository"
 	"github.com/PlakarKorp/plakar/api"
 	"github.com/PlakarKorp/plakar/utils"
@@ -40,10 +41,10 @@ type UiOptions struct {
 //go:embed frontend/*
 var content embed.FS
 
-func Ui(repo *repository.Repository, addr string, opts *UiOptions) error {
+func Ui(ctx *appcontext.AppContext, repo *repository.Repository, addr string, opts *UiOptions) error {
 	server := http.NewServeMux()
 
-	if err := api.SetupRoutes(server, repo, opts.Token); err != nil {
+	if err := api.SetupRoutes(ctx, server, repo, opts.Token); err != nil {
 		return err
 	}
 
