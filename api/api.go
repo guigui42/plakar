@@ -174,24 +174,8 @@ func SetupRoutes(ctx *appcontext.AppContext, server *http.ServeMux, repo *reposi
 	server.Handle("GET /api/repository/state/{state}", authToken(JSONAPIView(repositoryState)))
 
 	server.Handle("GET /api/viewers/available", authToken(JSONAPIView(viewersApi.GetAvailableViewers)))
-	server.Handle("POST /api/viewers", authToken(JSONAPIView(viewersApi.StartViewer)))
-
-	// GET /api/pvr/{id}: get the status of a specific visualization, potentially returning several containers
-
-	// GET /api/pvr: list all the running visualizations
-	// POST /api/pvr: start a new visualization
-	/*
-		 params:
-		 	- type
-			- snapshot
-			- path
-	*/
-	// GET /api/pvr/{id}: get the status of a specific visualization, potentially returning several containers
-	// DELETE /api/pvr/{id}: stop a specific visualization
-	// GET /api/pvr/{id}/attach: attach to a specific visualization with a websocket
-
-	// server.Handle("POST /api/repository/visualizations/{visualization}", authToken(JSONAPIView(visualizationApi.Start)))
-	// server.Handle("GET /api/repository/visualizations/ws", authToken(JSONAPIView(visualizationApi.WebSocket)))
+	server.Handle("POST /api/viewers/start", authToken(JSONAPIView(viewersApi.StartViewer)))
+	server.Handle("GET /api/viewers/ws", authToken(JSONAPIView(viewersApi.WebSocket)))
 
 	server.Handle("GET /api/snapshot/{snapshot}", authToken(JSONAPIView(snapshotHeader)))
 	server.Handle("GET /api/snapshot/reader/{snapshot_path...}", urlSigner.VerifyMiddleware(APIView(snapshotReader)))

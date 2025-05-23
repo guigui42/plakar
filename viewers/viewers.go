@@ -10,6 +10,8 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/creack/pty"
+
 	"github.com/PlakarKorp/kloset/appcontext"
 	"github.com/PlakarKorp/kloset/repository"
 	"github.com/PlakarKorp/plakar/subcommands/server"
@@ -23,8 +25,7 @@ type Viewer interface {
 }
 
 type AttachableViewer interface {
-	// Attach returns the name of the container to attach to.
-	Attach() string
+	GetExecArgs() []string
 }
 
 type Runner struct {
@@ -140,5 +141,30 @@ func (r *Runner) Run(ctx *appcontext.AppContext, snapshot string, path string) (
 	return &RunnerStatus{
 		Services: services,
 	}, nil
+}
 
+func (r *Runner) Attach() (*exec.Cmd, *os.File, error) {
+	viewer, ok := r.viewer.(AttachableViewer)
+	if !ok {
+		return nil, nil, fmt.Errorf("viewer does not support attaching")
+	}
+
+	cmdArgs := []string{
+		"compose",
+		"-f", filepath.Join(r.Path, "compose.yaml"),
+		"-f", filepath.Join(r.Path, "volumes.yaml"),
+		"exec",
+	}
+	cmdArgs = append(cmdArgs, viewer.GetExecArgs()...)
+
+	cmd := exec.Command(
+		"docker", cmdArgs...,
+	)
+
+	ptmx, err := pty.Start(cmd)
+	if err != nil {
+		return nil, nil, fmt.Errorf("failed to start pty: %w", err)
+	}
+
+	return cmd, ptmx, nil
 }

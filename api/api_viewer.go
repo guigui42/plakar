@@ -3,11 +3,8 @@ package api
 import (
 	"encoding/json"
 	"fmt"
-	"log"
 	"net/http"
-	"os/exec"
 
-	"github.com/creack/pty"
 	"github.com/gorilla/websocket"
 
 	"github.com/PlakarKorp/kloset/appcontext"
@@ -34,7 +31,6 @@ type Viewer struct {
 
 var Viewers = []Viewer{
 	{Id: "terminal", Name: "Terminal"},
-	{Id: "postgres", Name: "PostgreSQL CLI"},
 }
 
 // GetAvailableViewers returns a list of all the available
@@ -167,8 +163,7 @@ func (api *ViewerAPI) StartViewer(w http.ResponseWriter, r *http.Request) error 
 }
 
 type WebSocketRequest struct {
-	Snapshot string `json:"snapshot"`
-	Path     string `json:"path"`
+	Viwwer string `json:"viewer"` // Viewer ID, returned by StartViewer
 	// XXX: add token
 }
 
@@ -185,6 +180,10 @@ func (api *ViewerAPI) WebSocket(w http.ResponseWriter, r *http.Request) error {
 	defer ws.Close()
 
 	msgType, message, err := ws.ReadMessage()
+	if err != nil {
+		return fmt.Errorf("failed to read message: %w", err)
+	}
+
 	if msgType != websocket.TextMessage {
 		return fmt.Errorf("expected text message, got %v", msgType)
 	}
@@ -194,59 +193,54 @@ func (api *ViewerAPI) WebSocket(w http.ResponseWriter, r *http.Request) error {
 		return fmt.Errorf("failed to decode request body: %w", err)
 	}
 
-	if request.Snapshot == "" {
-		// Return an error to the client
-		return fmt.Errorf("snapshot is required")
-	}
-	if request.Path == "" {
-		// Return an error to the client
-		return fmt.Errorf("path is required")
+	if request.Viwwer == "" {
+		return fmt.Errorf("viewer is required")
 	}
 
-	cmd := exec.Command("docker", "run", "--rm", "--privileged", "-ti", "test", "-host", "http://host.docker.internal:9888", "-snapshot", request.Snapshot, "-path", request.Path)
-	ptmx, err := pty.Start(cmd)
-	if err != nil {
-		return fmt.Errorf("failed to start pty: %w", err)
-	}
-	defer ptmx.Close()
+	// cmd := exec.Command("docker", "run", "--rm", "--privileged", "-ti", "test", "-host", "http://host.docker.internal:9888", "-snapshot", request.Snapshot, "-path", request.Path)
+	// ptmx, err := pty.Start(cmd)
+	// if err != nil {
+	// 	return fmt.Errorf("failed to start pty: %w", err)
+	// }
+	// defer ptmx.Close()
 
-	go func() {
-		for {
-			buf := make([]byte, 1024)
-			n, err := ptmx.Read(buf)
-			if err != nil {
-				fmt.Printf("Unable to read from pty: %v\n", err)
-				return
-			}
+	// go func() {
+	// 	for {
+	// 		buf := make([]byte, 1024)
+	// 		n, err := ptmx.Read(buf)
+	// 		if err != nil {
+	// 			fmt.Printf("Unable to read from pty: %v\n", err)
+	// 			return
+	// 		}
 
-			if err := ws.WriteMessage(websocket.TextMessage, buf[:n]); err != nil {
-				log.Println("Error writing to WebSocket:", err)
-				return
-			}
-		}
-	}()
+	// 		if err := ws.WriteMessage(websocket.TextMessage, buf[:n]); err != nil {
+	// 			log.Println("Error writing to WebSocket:", err)
+	// 			return
+	// 		}
+	// 	}
+	// }()
 
-	go func() {
-		for {
-			_, message, err := ws.ReadMessage()
-			fmt.Printf("Received message: %s\n", message)
+	// go func() {
+	// 	for {
+	// 		_, message, err := ws.ReadMessage()
+	// 		fmt.Printf("Received message: %s\n", message)
 
-			if err != nil {
-				log.Println("Error reading from WebSocket:", err)
-				break
-			}
+	// 		if err != nil {
+	// 			log.Println("Error reading from WebSocket:", err)
+	// 			break
+	// 		}
 
-			n, err := ptmx.Write(message)
-			if err != nil {
-				fmt.Printf("Unable to write to pty: %v\n", err)
-				return
-			}
+	// 		n, err := ptmx.Write(message)
+	// 		if err != nil {
+	// 			fmt.Printf("Unable to write to pty: %v\n", err)
+	// 			return
+	// 		}
 
-			fmt.Printf("written: %v\n", n)
-		}
-	}()
+	// 		fmt.Printf("written: %v\n", n)
+	// 	}
+	// }()
 
-	cmd.Wait()
+	// cmd.Wait()
 
 	return nil
 }
