@@ -52,7 +52,7 @@ func NewRunner(repo *repository.Repository, viewer Viewer) (*Runner, error) {
 	}, nil
 }
 
-func (r *Runner) Run(ctx *appcontext.AppContext) error {
+func (r *Runner) Run(ctx *appcontext.AppContext, snapshot string, path string) error {
 	port := 9888
 
 	// Run Plakar HTTP server in a goroutine. Necessary for visualization
@@ -68,6 +68,8 @@ func (r *Runner) Run(ctx *appcontext.AppContext) error {
 
 	// Create the volume.yaml file
 	content := strings.ReplaceAll(volumesCompose, "__PLAKAR_SERVER__", fmt.Sprintf("http://host.docker.internal:%d", port))
+	content = strings.ReplaceAll(content, "__PLAKAR_SNAPSHOT__", snapshot)
+	content = strings.ReplaceAll(content, "__PLAKAR_SNAPSHOT_PATH__", path)
 	composePath := filepath.Join(r.Path, "volumes.yaml")
 
 	if err := os.WriteFile(composePath, []byte(content), 0644); err != nil {

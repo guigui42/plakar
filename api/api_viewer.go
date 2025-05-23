@@ -38,12 +38,12 @@ var Viewers = []Viewer{
 }
 
 // GetAvailableViewers returns a list of all the available
-// visualizations. For now, this list is hardcoded.
+// viewers. For now, this list is hardcoded.
 // In the future, this endpoint will accept the parameters ?snapshot and ?path
-// to filter the list of visualizations available for the given snapshot and
+// to filter the list of viewers available for the given snapshot and
 // path.
 // Also, in the future, a plugin system will be implemented to allow extending
-// the list of available visualizations.
+// the list of available viewers.
 func (api *ViewerAPI) GetAvailableViewers(w http.ResponseWriter, r *http.Request) error {
 	offset, err := QueryParamToUint32(r, "offset", 0, 0)
 	if err != nil {
@@ -76,7 +76,7 @@ func (api *ViewerAPI) GetAvailableViewers(w http.ResponseWriter, r *http.Request
 }
 
 type StartViewerRequest struct {
-	Viewer   string `json:"visualization"` // Viewer ID
+	Viewer   string `json:"viewer"` // Viewer ID
 	Snapshot string `json:"snapshot"`
 	Path     string `json:"path"`
 }
@@ -96,7 +96,7 @@ func (api *ViewerAPI) StartViewer(w http.ResponseWriter, r *http.Request) error 
 		return &ApiError{
 			HttpCode: 400,
 			ErrCode:  "bad-request",
-			Message:  "visualization is required",
+			Message:  "viewer is required",
 		}
 	}
 	found := false
@@ -110,7 +110,7 @@ func (api *ViewerAPI) StartViewer(w http.ResponseWriter, r *http.Request) error 
 		return &ApiError{
 			HttpCode: 400,
 			ErrCode:  "bad-request",
-			Message:  "invalid visualization type",
+			Message:  "invalid viewer type",
 		}
 	}
 
@@ -140,7 +140,7 @@ func (api *ViewerAPI) StartViewer(w http.ResponseWriter, r *http.Request) error 
 		return &ApiError{
 			HttpCode: 400,
 			ErrCode:  "bad-request",
-			Message:  "invalid visualization type",
+			Message:  "invalid viewer type",
 		}
 	}
 
@@ -149,7 +149,7 @@ func (api *ViewerAPI) StartViewer(w http.ResponseWriter, r *http.Request) error 
 		return fmt.Errorf("failed to create runner: %w", err)
 	}
 
-	if err := runner.Run(api.ctx); err != nil {
+	if err := runner.Run(api.ctx, req.Snapshot, req.Path); err != nil {
 		return err
 	}
 

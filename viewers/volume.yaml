@@ -3,3 +3,5 @@ volumes:
     driver: brmzkw/kloset
     driver_opts:
       host: __PLAKAR_SERVER__
+      snapshot: __PLAKAR_SNAPSHOT__
+      path: __PLAKAR_SNAPSHOT_PATH__
