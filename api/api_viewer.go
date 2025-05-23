@@ -15,36 +15,36 @@ import (
 	"github.com/PlakarKorp/plakar/viewers"
 )
 
-type VisualizationAPI struct {
+type ViewerAPI struct {
 	ctx  *appcontext.AppContext
 	repo *repository.Repository
 }
 
-func NewVisualizationAPI(ctx *appcontext.AppContext, repo *repository.Repository) *VisualizationAPI {
-	return &VisualizationAPI{
+func NewViewerAPI(ctx *appcontext.AppContext, repo *repository.Repository) *ViewerAPI {
+	return &ViewerAPI{
 		ctx,
 		repo,
 	}
 }
 
-type Visualization struct {
+type Viewer struct {
 	Id   string `json:"id"`
 	Name string `json:"name"`
 }
 
-var Visualizations = []Visualization{
+var Viewers = []Viewer{
 	{Id: "terminal", Name: "Terminal"},
 	{Id: "postgres", Name: "PostgreSQL CLI"},
 }
 
-// GetAvailableVisualizations returns a list of all the available
+// GetAvailableViewers returns a list of all the available
 // visualizations. For now, this list is hardcoded.
 // In the future, this endpoint will accept the parameters ?snapshot and ?path
 // to filter the list of visualizations available for the given snapshot and
 // path.
 // Also, in the future, a plugin system will be implemented to allow extending
 // the list of available visualizations.
-func (api *VisualizationAPI) GetAvailableVisualizations(w http.ResponseWriter, r *http.Request) error {
+func (api *ViewerAPI) GetAvailableViewers(w http.ResponseWriter, r *http.Request) error {
 	offset, err := QueryParamToUint32(r, "offset", 0, 0)
 	if err != nil {
 		return err
@@ -55,48 +55,44 @@ func (api *VisualizationAPI) GetAvailableVisualizations(w http.ResponseWriter, r
 
 	}
 
-	if offset > uint32(len(Visualizations)) {
-		return json.NewEncoder(w).Encode(Items[Visualization]{
-			Total: len(Visualizations),
-			Items: []Visualization{},
+	if offset > uint32(len(Viewers)) {
+		return json.NewEncoder(w).Encode(Items[Viewer]{
+			Total: len(Viewers),
+			Items: []Viewer{},
 		})
 	}
-	if offset+limit > uint32(len(Visualizations)) {
-		return json.NewEncoder(w).Encode(Items[Visualization]{
-			Total: len(Visualizations),
-			Items: Visualizations[offset:],
+	if offset+limit > uint32(len(Viewers)) {
+		return json.NewEncoder(w).Encode(Items[Viewer]{
+			Total: len(Viewers),
+			Items: Viewers[offset:],
 		})
 	}
 
 	return json.NewEncoder(w).Encode(
-		Items[Visualization]{
-			Total: len(Visualizations),
-			Items: Visualizations[offset : offset+limit],
+		Items[Viewer]{
+			Total: len(Viewers),
+			Items: Viewers[offset : offset+limit],
 		})
 }
 
-func (api *VisualizationAPI) ListRunningVisualizations(w http.ResponseWriter, r *http.Request) error {
-	return nil
+type StartViewerRequest struct {
+	Viewer   string `json:"visualization"` // Viewer ID
+	Snapshot string `json:"snapshot"`
+	Path     string `json:"path"`
 }
 
-type StartVisualizationRequest struct {
-	Visualization string `json:"visualization"` // Visualization ID
-	Snapshot      string `json:"snapshot"`
-	Path          string `json:"path"`
-}
-
-type StartVisualizationResponse struct {
+type StartViewerResponse struct {
 	Id string `json:"id"`
 }
 
-func (api *VisualizationAPI) StartVisualization(w http.ResponseWriter, r *http.Request) error {
-	var req StartVisualizationRequest
+func (api *ViewerAPI) StartViewer(w http.ResponseWriter, r *http.Request) error {
+	var req StartViewerRequest
 
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		return fmt.Errorf("failed to decode request body: %w", err)
 	}
 
-	if req.Visualization == "" {
+	if req.Viewer == "" {
 		return &ApiError{
 			HttpCode: 400,
 			ErrCode:  "bad-request",
@@ -104,8 +100,8 @@ func (api *VisualizationAPI) StartVisualization(w http.ResponseWriter, r *http.R
 		}
 	}
 	found := false
-	for _, v := range Visualizations {
-		if v.Id == req.Visualization {
+	for _, v := range Viewers {
+		if v.Id == req.Viewer {
 			found = true
 			break
 		}
@@ -135,7 +131,7 @@ func (api *VisualizationAPI) StartVisualization(w http.ResponseWriter, r *http.R
 
 	var viewer viewers.Viewer
 
-	switch req.Visualization {
+	switch req.Viewer {
 	case "terminal":
 		viewer = viewers.NewTerminal()
 	}
@@ -157,7 +153,7 @@ func (api *VisualizationAPI) StartVisualization(w http.ResponseWriter, r *http.R
 		return err
 	}
 
-	return json.NewEncoder(w).Encode(StartVisualizationResponse{
+	return json.NewEncoder(w).Encode(StartViewerResponse{
 		Id: runner.Path,
 	})
 }
@@ -168,7 +164,7 @@ type WebSocketRequest struct {
 	// XXX: add token
 }
 
-func (api *VisualizationAPI) WebSocket(w http.ResponseWriter, r *http.Request) error {
+func (api *ViewerAPI) WebSocket(w http.ResponseWriter, r *http.Request) error {
 	upgrader := websocket.Upgrader{
 		CheckOrigin: func(r *http.Request) bool {
 			return true

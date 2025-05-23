@@ -142,7 +142,7 @@ func SetupRoutes(ctx *appcontext.AppContext, server *http.ServeMux, repo *reposi
 	authToken := TokenAuthMiddleware(token)
 	urlSigner := NewSnapshotReaderURLSigner(token)
 
-	visualizationApi := NewVisualizationAPI(ctx, repo)
+	viewersApi := NewViewerAPI(ctx, repo)
 
 	// Catch all API endpoint, called if no more specific API endpoint is found
 	server.Handle("/api/", JSONAPIView(func(w http.ResponseWriter, r *http.Request) error {
@@ -173,8 +173,8 @@ func SetupRoutes(ctx *appcontext.AppContext, server *http.ServeMux, repo *reposi
 	server.Handle("GET /api/repository/states", authToken(JSONAPIView(repositoryStates)))
 	server.Handle("GET /api/repository/state/{state}", authToken(JSONAPIView(repositoryState)))
 
-	server.Handle("GET /api/visualizations/available", authToken(JSONAPIView(visualizationApi.GetAvailableVisualizations)))
-	server.Handle("POST /api/visualizations", authToken(JSONAPIView(visualizationApi.StartVisualization)))
+	server.Handle("GET /api/viewers/available", authToken(JSONAPIView(viewersApi.GetAvailableViewers)))
+	server.Handle("POST /api/viewers", authToken(JSONAPIView(viewersApi.StartViewer)))
 
 	// GET /api/pvr/{id}: get the status of a specific visualization, potentially returning several containers
 
