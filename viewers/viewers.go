@@ -3,6 +3,7 @@ package viewers
 import (
 	_ "embed"
 	"fmt"
+	"math/rand"
 	"os"
 	"os/exec"
 	"path/filepath"
@@ -53,10 +54,13 @@ func NewRunner(repo *repository.Repository, viewer Viewer) (*Runner, error) {
 }
 
 func (r *Runner) Run(ctx *appcontext.AppContext, snapshot string, path string) error {
-	port := 9888
-
 	// Run Plakar HTTP server in a goroutine. Necessary for visualization
 	// XXX: listen on a random port instead, or even on a UNIX socket
+
+	min := 9000
+	max := 12000
+	port := rand.Intn(max-min+1) + min // random int in [9000, 12000]
+
 	go func() {
 		server := &server.Server{
 			ListenAddr: fmt.Sprintf("127.0.0.1:%d", port),
