@@ -78,8 +78,9 @@ type StartViewerRequest struct {
 }
 
 type StartViewerResponse struct {
-	Id       string   `json:"id"`
-	Services []string `json:"services"`
+	Id         string   `json:"id"`
+	Services   []string `json:"services"`
+	Attachable bool     `json:"attachable"`
 }
 
 func (api *ViewerAPI) StartViewer(w http.ResponseWriter, r *http.Request) error {
@@ -157,13 +158,14 @@ func (api *ViewerAPI) StartViewer(w http.ResponseWriter, r *http.Request) error 
 	}
 
 	return json.NewEncoder(w).Encode(StartViewerResponse{
-		Id:       runner.Path,
-		Services: services,
+		Id:         runner.Path,
+		Services:   services,
+		Attachable: status.Attachable,
 	})
 }
 
 type WebSocketRequest struct {
-	Viwwer string `json:"viewer"` // Viewer ID, returned by StartViewer
+	Viewer string `json:"viewer"` // Viewer ID, returned by StartViewer
 	// XXX: add token
 }
 
@@ -193,7 +195,7 @@ func (api *ViewerAPI) WebSocket(w http.ResponseWriter, r *http.Request) error {
 		return fmt.Errorf("failed to decode request body: %w", err)
 	}
 
-	if request.Viwwer == "" {
+	if request.Viewer == "" {
 		return fmt.Errorf("viewer is required")
 	}
 

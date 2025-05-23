@@ -56,7 +56,8 @@ func NewRunner(repo *repository.Repository, viewer Viewer) (*Runner, error) {
 }
 
 type RunnerStatus struct {
-	Services []string
+	Services   []string
+	Attachable bool
 }
 
 // DockerComposePsOutput is the output of the `docker compose ps --format json`
@@ -138,8 +139,11 @@ func (r *Runner) Run(ctx *appcontext.AppContext, snapshot string, path string) (
 		}
 	}
 
+	_, attachable := r.viewer.(AttachableViewer)
+
 	return &RunnerStatus{
-		Services: services,
+		Services:   services,
+		Attachable: attachable,
 	}, nil
 }
 
