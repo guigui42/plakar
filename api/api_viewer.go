@@ -82,7 +82,8 @@ type StartViewerRequest struct {
 }
 
 type StartViewerResponse struct {
-	Id string `json:"id"`
+	Id       string   `json:"id"`
+	Services []string `json:"services"`
 }
 
 func (api *ViewerAPI) StartViewer(w http.ResponseWriter, r *http.Request) error {
@@ -149,12 +150,19 @@ func (api *ViewerAPI) StartViewer(w http.ResponseWriter, r *http.Request) error 
 		return fmt.Errorf("failed to create runner: %w", err)
 	}
 
-	if err := runner.Run(api.ctx, req.Snapshot, req.Path); err != nil {
+	status, err := runner.Run(api.ctx, req.Snapshot, req.Path)
+	if err != nil {
 		return err
 	}
 
+	services := []string{}
+	for _, service := range status.Services {
+		services = append(services, fmt.Sprintf("http://%s", service))
+	}
+
 	return json.NewEncoder(w).Encode(StartViewerResponse{
-		Id: runner.Path,
+		Id:       runner.Path,
+		Services: services,
 	})
 }
 

@@ -2,6 +2,7 @@ package viewers
 
 import (
 	_ "embed"
+	"encoding/json"
 	"fmt"
 	"math/rand"
 	"os"
@@ -53,10 +54,23 @@ func NewRunner(repo *repository.Repository, viewer Viewer) (*Runner, error) {
 	}, nil
 }
 
-func (r *Runner) Run(ctx *appcontext.AppContext, snapshot string, path string) error {
+type RunnerStatus struct {
+	Services []string
+}
+
+// DockerComposePsOutput is the output of the `docker compose ps --format json`
+// command. The command actually returns more fields than this, but we don't
+// need them.
+type DockerComposePsOutput struct {
+	Publishers []struct {
+		URL           string `json:"URL"`
+		PublishedPort int    `json:"PublishedPort"`
+	}
+}
+
+func (r *Runner) Run(ctx *appcontext.AppContext, snapshot string, path string) (*RunnerStatus, error) {
 	// Run Plakar HTTP server in a goroutine. Necessary for visualization
 	// XXX: listen on a random port instead, or even on a UNIX socket
-
 	min := 9000
 	max := 12000
 	port := rand.Intn(max-min+1) + min // random int in [9000, 12000]
@@ -77,22 +91,54 @@ func (r *Runner) Run(ctx *appcontext.AppContext, snapshot string, path string) e
 	composePath := filepath.Join(r.Path, "volumes.yaml")
 
 	if err := os.WriteFile(composePath, []byte(content), 0644); err != nil {
-		return fmt.Errorf("failed to write compose file: %w", err)
+		return nil, fmt.Errorf("failed to write compose file: %w", err)
 	}
 
-	cmd := exec.Command(
+	upCmd := exec.Command(
 		"docker", "compose",
 		"-f", filepath.Join(r.Path, "compose.yaml"),
 		"-f", filepath.Join(r.Path, "volumes.yaml"),
 		"up", "-d",
 	)
-	cmd.Stdout = os.Stdout
-	cmd.Stderr = os.Stderr
-	cmd.Dir = r.Path // necessary so Compose uses that directory as its context
+	upCmd.Stdout = os.Stdout
+	upCmd.Stderr = os.Stderr
+	upCmd.Dir = r.Path // necessary so Compose uses that directory as its context
 
-	if err := cmd.Run(); err != nil {
-		return fmt.Errorf("failed to run docker compose: %w", err)
+	if err := upCmd.Run(); err != nil {
+		return nil, fmt.Errorf("failed to run docker compose: %w", err)
 	}
 
-	return nil
+	psCmd := exec.Command(
+		"docker", "compose",
+		"-f", filepath.Join(r.Path, "compose.yaml"),
+		"-f", filepath.Join(r.Path, "volumes.yaml"),
+		"ps", "--format", "json",
+	)
+
+	output, err := psCmd.Output()
+	if err != nil {
+		return nil, fmt.Errorf("failed to run docker compose ps: %w", err)
+	}
+
+	services := []string{}
+
+	for _, line := range strings.Split(string(output), "\n") {
+		if line == "" {
+			continue
+		}
+
+		var psOutput DockerComposePsOutput
+		if err := json.Unmarshal([]byte(line), &psOutput); err != nil {
+			return nil, fmt.Errorf("failed to unmarshal docker compose ps output: %w", err)
+		}
+
+		for _, publisher := range psOutput.Publishers {
+			services = append(services, fmt.Sprintf("%s:%d", publisher.URL, publisher.PublishedPort))
+		}
+	}
+
+	return &RunnerStatus{
+		Services: services,
+	}, nil
+
 }
