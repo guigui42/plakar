@@ -11,6 +11,7 @@ import (
 	"github.com/gorilla/websocket"
 
 	"github.com/PlakarKorp/plakar/pvr"
+	"github.com/PlakarKorp/plakar/viewers"
 )
 
 type VisualizationAPI struct {
@@ -25,13 +26,12 @@ func NewVisualizationAPI(pvr *pvr.PVR) *VisualizationAPI {
 
 type Visualization struct {
 	Id   string `json:"id"`
-	Type string `json:"type"`
 	Name string `json:"name"`
 }
 
 var Visualizations = []Visualization{
-	{Id: "terminal", Type: "terminal", Name: "Terminal"},
-	{Id: "postgres", Type: "terminal", Name: "PostgreSQL CLI"},
+	{Id: "terminal", Name: "Terminal"},
+	{Id: "postgres", Name: "PostgreSQL CLI"},
 }
 
 // GetAvailableVisualizations returns a list of all the available
@@ -82,6 +82,10 @@ type StartVisualizationRequest struct {
 	Path          string `json:"path"`
 }
 
+type StartVisualizationResponse struct {
+	Id string `json:"id"`
+}
+
 func (api *VisualizationAPI) StartVisualization(w http.ResponseWriter, r *http.Request) error {
 	var req StartVisualizationRequest
 
@@ -126,39 +130,29 @@ func (api *VisualizationAPI) StartVisualization(w http.ResponseWriter, r *http.R
 		}
 	}
 
+	var viewer viewers.Viewer
+
 	switch req.Visualization {
 	case "terminal":
-
-	default:
-		fmt.Printf("Todo: start visualization of type: %s\n", req.Visualization)
+		viewer = viewers.NewTerminal()
 	}
 
-	return nil
-}
-
-func (api *VisualizationAPI) Start(w http.ResponseWriter, r *http.Request) error {
-	visualization := r.PathValue("visualization")
-
-	var req StartVisualizationRequest
-
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		return fmt.Errorf("failed to decode request body: %w", err)
-	}
-
-	switch visualization {
-	case "terminal":
-		if _, err := api.pvr.StartContainer(pvr.StartContainerOptions{}); err != nil {
-			return fmt.Errorf("failed to start container: %w", err)
+	if viewer == nil {
+		return &ApiError{
+			HttpCode: 400,
+			ErrCode:  "bad-request",
+			Message:  "invalid visualization type",
 		}
-		return nil
 	}
 
-	return &ApiError{
-		HttpCode: 400,
-		ErrCode:  "bad-request",
-		Message:  "invalid visualization type",
+	runner, err := viewers.NewRunner(viewer)
+	if err != nil {
+		return fmt.Errorf("failed to create runner: %w", err)
 	}
 
+	return json.NewEncoder(w).Encode(StartVisualizationResponse{
+		Id: runner.Path,
+	})
 }
 
 type WebSocketRequest struct {

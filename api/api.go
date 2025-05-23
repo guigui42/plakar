@@ -179,7 +179,6 @@ func SetupRoutes(server *http.ServeMux, repo *repository.Repository, token strin
 	server.Handle("GET /api/repository/state/{state}", authToken(JSONAPIView(repositoryState)))
 
 	server.Handle("GET /api/visualizations/available", authToken(JSONAPIView(visualizationApi.GetAvailableVisualizations)))
-	server.Handle("GET /api/visualizations", authToken(JSONAPIView(visualizationApi.ListRunningVisualizations)))
 	server.Handle("POST /api/visualizations", authToken(JSONAPIView(visualizationApi.StartVisualization)))
 
 	// GET /api/pvr/{id}: get the status of a specific visualization, potentially returning several containers
