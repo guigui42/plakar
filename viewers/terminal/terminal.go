@@ -1,9 +1,9 @@
-package viewers
+package terminal
 
 import _ "embed"
 
 //go:embed terminal.yaml
-var terminalCompose string
+var compose string
 
 type Terminal struct {
 }
@@ -13,7 +13,7 @@ func NewTerminal() *Terminal {
 }
 
 func (t *Terminal) GetCompose() string {
-	return terminalCompose
+	return compose
 }
 
 func (t *Terminal) GetExecArgs() []string {

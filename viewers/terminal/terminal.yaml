@@ -1,0 +1,7 @@
+services:
+  app:
+    volumes:
+      - snapshot:/data
+    image: "ubuntu"
+    working_dir: /data
+    command: sleep infinity

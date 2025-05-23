@@ -9,13 +9,53 @@ import (
 	"os/exec"
 	"path/filepath"
 	"strings"
+	"sync"
 
 	"github.com/creack/pty"
 
 	"github.com/PlakarKorp/kloset/appcontext"
 	"github.com/PlakarKorp/kloset/repository"
 	"github.com/PlakarKorp/plakar/subcommands/server"
+	"github.com/PlakarKorp/plakar/viewers/nginx"
+	"github.com/PlakarKorp/plakar/viewers/terminal"
 )
+
+// XXX: do something better than a global singleton. We could instanciate a
+// manager instead. It will make tests easier.
+var Manager *runnerManager
+
+func init() {
+	Manager = &runnerManager{
+		runners: make(map[string]*Runner),
+	}
+}
+
+type runnerManager struct {
+	mu      sync.Mutex
+	runners map[string]*Runner
+}
+
+func (rm *runnerManager) RegisterRunner(runner *Runner) {
+	rm.mu.Lock()
+	defer rm.mu.Unlock()
+
+	rm.runners[runner.Path] = runner
+}
+
+func (rm *runnerManager) GetRunner(path string) (*Runner, bool) {
+	rm.mu.Lock()
+	defer rm.mu.Unlock()
+
+	runner, ok := rm.runners[path]
+	return runner, ok
+}
+
+func (rm *runnerManager) UnregisterRunner(path string) {
+	rm.mu.Lock()
+	defer rm.mu.Unlock()
+
+	delete(rm.runners, path)
+}
 
 //go:embed volume.yaml
 var volumesCompose string
@@ -171,4 +211,14 @@ func (r *Runner) Attach() (*exec.Cmd, *os.File, error) {
 	}
 
 	return cmd, ptmx, nil
+}
+
+func NewViewer(name string) Viewer {
+	switch name {
+	case "terminal":
+		return terminal.NewTerminal()
+	case "nginx":
+		return nginx.NewNginx()
+	}
+	return nil
 }

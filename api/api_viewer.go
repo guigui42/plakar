@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"net/http"
 	"os"
 
@@ -31,6 +32,7 @@ type Viewer struct {
 
 var Viewers = []Viewer{
 	{Id: "terminal", Name: "Terminal"},
+	{Id: "nginx", Name: "Nginx"},
 }
 
 // GetAvailableViewers returns a list of all the available
@@ -127,12 +129,7 @@ func (api *ViewerAPI) StartViewer(w http.ResponseWriter, r *http.Request) error 
 		}
 	}
 
-	var viewer viewers.Viewer
-
-	switch req.Viewer {
-	case "terminal":
-		viewer = viewers.NewTerminal()
-	}
+	viewer := viewers.NewViewer(req.Viewer)
 
 	if viewer == nil {
 		return &ApiError{
@@ -146,6 +143,8 @@ func (api *ViewerAPI) StartViewer(w http.ResponseWriter, r *http.Request) error 
 	if err != nil {
 		return fmt.Errorf("failed to create runner: %w", err)
 	}
+
+	viewers.Manager.RegisterRunner(runner)
 
 	status, err := runner.Run(api.ctx, req.Snapshot, req.Path)
 	if err != nil {
@@ -210,53 +209,51 @@ func (api *ViewerAPI) WebSocket(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// todo: find the instance of docker compose
-	// call attach
+	runner, ok := viewers.Manager.GetRunner(request.Viewer)
+	if !ok {
+		fmt.Fprintf(os.Stderr, "getRunner error: %v\n", err)
+		return
+	}
 
-	// cmd := exec.Command("docker", "run", "--rm", "--privileged", "-ti", "test", "-host", "http://host.docker.internal:9888", "-snapshot", request.Snapshot, "-path", request.Path)
-	// ptmx, err := pty.Start(cmd)
-	// if err != nil {
-	// 	return fmt.Errorf("failed to start pty: %w", err)
-	// }
-	// defer ptmx.Close()
+	cmd, ptmx, err := runner.Attach()
+	if err != nil {
+		fmt.Fprintf(os.Stderr, "attach error: %v", err)
+	}
 
-	// go func() {
-	// 	for {
-	// 		buf := make([]byte, 1024)
-	// 		n, err := ptmx.Read(buf)
-	// 		if err != nil {
-	// 			fmt.Printf("Unable to read from pty: %v\n", err)
-	// 			return
-	// 		}
+	defer ptmx.Close()
 
-	// 		if err := ws.WriteMessage(websocket.TextMessage, buf[:n]); err != nil {
-	// 			log.Println("Error writing to WebSocket:", err)
-	// 			return
-	// 		}
-	// 	}
-	// }()
+	// XXX: question: is it possible to use a Pipe instead of copy to/from the websocket manually?
+	go func() {
+		for {
+			buf := make([]byte, 1024)
+			n, err := ptmx.Read(buf)
+			if err != nil {
+				fmt.Printf("Unable to read from pty: %v\n", err)
+				return
+			}
 
-	// go func() {
-	// 	for {
-	// 		_, message, err := ws.ReadMessage()
-	// 		fmt.Printf("Received message: %s\n", message)
+			if err := ws.WriteMessage(websocket.TextMessage, buf[:n]); err != nil {
+				log.Println("Error writing to WebSocket:", err)
+				return
+			}
+		}
+	}()
 
-	// 		if err != nil {
-	// 			log.Println("Error reading from WebSocket:", err)
-	// 			break
-	// 		}
+	go func() {
+		for {
+			_, message, err := ws.ReadMessage()
 
-	// 		n, err := ptmx.Write(message)
-	// 		if err != nil {
-	// 			fmt.Printf("Unable to write to pty: %v\n", err)
-	// 			return
-	// 		}
+			if err != nil {
+				log.Println("Error reading from WebSocket:", err)
+				break
+			}
 
-	// 		fmt.Printf("written: %v\n", n)
-	// 	}
-	// }()
+			if _, err := ptmx.Write(message); err != nil {
+				fmt.Fprintf(os.Stderr, "Unable to write to pty: %v\n", err)
+				return
+			}
+		}
+	}()
 
-	// cmd.Wait()
-
-	// return nil
+	_ = cmd.Wait()
 }
