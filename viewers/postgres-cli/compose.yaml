@@ -1,15 +1,29 @@
 services:
-  app:
+  db:
+    image: postgres
     volumes:
       - snapshot:/data
-    image: "postgres"
     environment:
       POSTGRES_PASSWORD: plakar
     working_dir: /data
-    entrypoint: [
-        "sh",
-        "-c",
-        # Hack command: for each ".sql" in the volume, we create a shell script in /docker-entrypoint-initdb.d to load sql once the server is running.
-        # We can't simply link the .sql in /docker-entrypoint-initdb.d because the function loading SQL in the entrypoint stops if there is an error, and we want to continue.
-        "find /data -maxdepth 1 -name '*.sql' | while read f; do filename=$$(basename $$f); echo psql -U postgres \\< $$f > /docker-entrypoint-initdb.d/$$filename.sh; chmod +x /docker-entrypoint-initdb.d/$$filename.sh; done; exec /usr/local/bin/docker-entrypoint.sh postgres",
-      ]
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "postgres"]
+      interval: 2s
+      retries: 10
+
+  init:
+    image: postgres
+    volumes:
+      - snapshot:/data
+    environment:
+      PGPASSWORD: plakar
+    depends_on:
+      db:
+        condition: service_healthy
+    entrypoint: >
+      bash -c "
+        createdb -h db -U postgres plakar &&
+        for f in /data/*.sql; do
+          psql -h db -U postgres -f \"$$f\" plakar;
+        done
+      "

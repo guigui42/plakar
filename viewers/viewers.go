@@ -137,6 +137,9 @@ func (r *Runner) Run(ctx *appcontext.AppContext, snapshot string, path string) (
 		return nil, fmt.Errorf("failed to write compose file: %w", err)
 	}
 
+	fmt.Printf("%s\n", r.Path)
+	fmt.Printf("docker compose -f %s -f %s ps\n", filepath.Join(r.Path, "compose.yaml"), filepath.Join(r.Path, "volumes.yaml"))
+
 	upCmd := exec.Command(
 		"docker", "compose",
 		"-f", filepath.Join(r.Path, "compose.yaml"),
@@ -176,7 +179,9 @@ func (r *Runner) Run(ctx *appcontext.AppContext, snapshot string, path string) (
 		}
 
 		for _, publisher := range psOutput.Publishers {
-			services = append(services, fmt.Sprintf("%s:%d", publisher.URL, publisher.PublishedPort))
+			if publisher.PublishedPort != 0 {
+				services = append(services, fmt.Sprintf("%s:%d", publisher.URL, publisher.PublishedPort))
+			}
 		}
 	}
 

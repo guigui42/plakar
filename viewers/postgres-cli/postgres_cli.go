@@ -17,5 +17,5 @@ func (t *PostgresCLI) GetCompose() string {
 }
 
 func (t *PostgresCLI) GetExecArgs() []string {
-	return []string{"app", "bash"}
+	return []string{"db", "psql", "-U", "postgres", "plakar"}
 }
