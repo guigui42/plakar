@@ -2,7 +2,7 @@ package nginx
 
 import _ "embed"
 
-//go:embed nginx.yaml
+//go:embed compose.yaml
 var compose string
 
 type Nginx struct {

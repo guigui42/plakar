@@ -5,3 +5,4 @@ services:
     ports:
       - "80"
     image: "nginx"
+# XXX: add autoindex to display files

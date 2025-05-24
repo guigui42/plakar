@@ -17,6 +17,7 @@ import (
 	"github.com/PlakarKorp/kloset/repository"
 	"github.com/PlakarKorp/plakar/subcommands/server"
 	"github.com/PlakarKorp/plakar/viewers/nginx"
+	postgres_cli "github.com/PlakarKorp/plakar/viewers/postgres-cli"
 	"github.com/PlakarKorp/plakar/viewers/terminal"
 )
 
@@ -219,6 +220,8 @@ func NewViewer(name string) Viewer {
 		return terminal.NewTerminal()
 	case "nginx":
 		return nginx.NewNginx()
+	case "postgres-cli":
+		return postgres_cli.NewPostgresCLI()
 	}
 	return nil
 }

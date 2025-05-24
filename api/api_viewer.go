@@ -30,9 +30,11 @@ type Viewer struct {
 	Name string `json:"name"`
 }
 
+// XXX: move the list in viewers.go?
 var Viewers = []Viewer{
 	{Id: "terminal", Name: "Terminal"},
 	{Id: "nginx", Name: "Nginx"},
+	{Id: "postgres-cli", Name: "PostgreSQL"},
 }
 
 // GetAvailableViewers returns a list of all the available

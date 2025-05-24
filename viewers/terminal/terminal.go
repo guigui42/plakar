@@ -2,7 +2,7 @@ package terminal
 
 import _ "embed"
 
-//go:embed terminal.yaml
+//go:embed compose.yaml
 var compose string
 
 type Terminal struct {
