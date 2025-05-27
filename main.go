@@ -156,7 +156,6 @@ func EntryPoint() int {
 	ctx := appcontext.NewAppContext()
 	defer ctx.Close()
 
-	fmt.Printf("Plugin directory: %s\n", filepath.Join(configDir, "plugins"))
 	importer.LoadBackends(ctx.Context, filepath.Join(configDir, "plugins"))
 
 	cfg, err := config.LoadOrCreate(opt_configfile)
