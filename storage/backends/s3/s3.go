@@ -29,6 +29,7 @@ import (
 	"github.com/PlakarKorp/plakar/appcontext"
 	"github.com/PlakarKorp/plakar/objects"
 	"github.com/PlakarKorp/plakar/storage"
+	"github.com/dustin/go-humanize"
 
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
@@ -297,6 +298,7 @@ func (s *Store) PutState(mac objects.MAC, rd io.Reader) (int64, error) {
 	}
 	defer os.Remove(rdCopy.Name()) // clean up when done
 	defer rdCopy.Close()
+	fmt.Fprintf(s.ctx.Stderr, "put state %02x/%016x: len=%s\n", mac[0], mac, humanize.Bytes(uint64(size)))
 
 	info, err := s.minioClient.PutObject(s.ctx, s.bucketName, s.realpath(fmt.Sprintf("states/%02x/%016x", mac[0], mac)), rdCopy, size, s.putObjectOptions)
 	if err != nil {
@@ -356,6 +358,7 @@ func (s *Store) PutPackfile(mac objects.MAC, rd io.Reader) (int64, error) {
 	}
 	defer os.Remove(rdCopy.Name()) // clean up when done
 	defer rdCopy.Close()
+	fmt.Fprintf(s.ctx.Stderr, "put packfile %02x/%016x: len=%s\n", mac[0], mac, humanize.Bytes(uint64(size)))
 
 	info, err := s.minioClient.PutObject(s.ctx, s.bucketName, s.realpath(fmt.Sprintf("packfiles/%02x/%016x", mac[0], mac)), rdCopy, size, s.putObjectOptions)
 	if err != nil {
