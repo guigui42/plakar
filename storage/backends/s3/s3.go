@@ -22,6 +22,7 @@ import (
 	"fmt"
 	"io"
 	"net/url"
+	"os"
 	"strconv"
 	"strings"
 
@@ -269,8 +270,35 @@ func (s *Store) GetStates() ([]objects.MAC, error) {
 	return ret, nil
 }
 
+func copyToTempFile(r io.Reader) (*os.File, int64, error) {
+	tmp, err := os.CreateTemp("", "copy-*")
+	if err != nil {
+		return nil, -1, err
+	}
+
+	n, err := io.Copy(tmp, r)
+	if err != nil {
+		tmp.Close()
+		return nil, -1, err
+	}
+
+	if _, err := tmp.Seek(0, io.SeekStart); err != nil {
+		tmp.Close()
+		return nil, -1, err
+	}
+
+	return tmp, n, nil
+}
+
 func (s *Store) PutState(mac objects.MAC, rd io.Reader) (int64, error) {
-	info, err := s.minioClient.PutObject(s.ctx, s.bucketName, s.realpath(fmt.Sprintf("states/%02x/%016x", mac[0], mac)), rd, -1, s.putObjectOptions)
+	rdCopy, size, err := copyToTempFile(rd)
+	if err != nil {
+		return 0, fmt.Errorf("copy to temp file: %w", err)
+	}
+	defer os.Remove(rdCopy.Name()) // clean up when done
+	defer rdCopy.Close()
+
+	info, err := s.minioClient.PutObject(s.ctx, s.bucketName, s.realpath(fmt.Sprintf("states/%02x/%016x", mac[0], mac)), rdCopy, size, s.putObjectOptions)
 	if err != nil {
 		return 0, fmt.Errorf("put object: %w", err)
 	}
@@ -322,7 +350,14 @@ func (s *Store) GetPackfiles() ([]objects.MAC, error) {
 }
 
 func (s *Store) PutPackfile(mac objects.MAC, rd io.Reader) (int64, error) {
-	info, err := s.minioClient.PutObject(s.ctx, s.bucketName, s.realpath(fmt.Sprintf("packfiles/%02x/%016x", mac[0], mac)), rd, -1, s.putObjectOptions)
+	rdCopy, size, err := copyToTempFile(rd)
+	if err != nil {
+		return 0, fmt.Errorf("copy to temp file: %w", err)
+	}
+	defer os.Remove(rdCopy.Name()) // clean up when done
+	defer rdCopy.Close()
+
+	info, err := s.minioClient.PutObject(s.ctx, s.bucketName, s.realpath(fmt.Sprintf("packfiles/%02x/%016x", mac[0], mac)), rdCopy, size, s.putObjectOptions)
 	if err != nil {
 		return 0, fmt.Errorf("put object: %w", err)
 	}
