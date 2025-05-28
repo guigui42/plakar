@@ -172,6 +172,12 @@ func New(ctx *appcontext.AppContext, storeConfig map[string]string) (Store, erro
 	if proto == "fs" && !filepath.IsAbs(location) {
 		location = filepath.Join(ctx.CWD, location)
 		storeConfig["location"] = "fs://" + location
+	} else if proto == "ptar" && !filepath.IsAbs(location) {
+		location = filepath.Join(ctx.CWD, location)
+		storeConfig["location"] = "ptar://" + location
+	} else if proto == "sqlite" && !filepath.IsAbs(location) {
+		location = filepath.Join(ctx.CWD, location)
+		storeConfig["location"] = "sqlite://" + location
 	} else {
 		storeConfig["location"] = proto + "://" + location
 	}
