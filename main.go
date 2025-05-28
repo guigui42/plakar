@@ -20,7 +20,7 @@ import (
 	"github.com/PlakarKorp/kloset/encryption"
 	"github.com/PlakarKorp/kloset/logging"
 	"github.com/PlakarKorp/kloset/repository"
-	"github.com/PlakarKorp/kloset/snapshot/importer"
+	"github.com/PlakarKorp/kloset/plugins"
 	"github.com/PlakarKorp/kloset/storage"
 	"github.com/PlakarKorp/kloset/versioning"
 	"github.com/PlakarKorp/plakar/agent"
@@ -156,7 +156,7 @@ func EntryPoint() int {
 	ctx := appcontext.NewAppContext()
 	defer ctx.Close()
 
-	importer.LoadBackends(ctx.Context, filepath.Join(configDir, "plugins"))
+	plugins.LoadBackends(ctx.Context, filepath.Join(configDir, "plugins"))
 
 	cfg, err := config.LoadOrCreate(opt_configfile)
 	if err != nil {
