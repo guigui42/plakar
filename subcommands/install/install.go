@@ -6,8 +6,8 @@ import (
 	"fmt"
 	"github.com/Masterminds/semver/v3"
 	"github.com/PlakarKorp/plakar/appcontext"
-	"github.com/PlakarKorp/plakar/cmd/plakar/subcommands"
-	"github.com/PlakarKorp/plakar/repository"
+	"github.com/PlakarKorp/plakar/subcommands"
+	"github.com/PlakarKorp/kloset/repository"
 	"io"
 	"net/http"
 	"os"
@@ -22,7 +22,7 @@ func init() {
 
 const plakarPackageUrl = "https://api.github.com/repos/PlakarKorp/plugins/contents"
 const branchName = "?ref=alban/Install-subcommand-test" //TODO: remove the branch name
-var pluginFolder = os.Getenv("HOME") + "/.plakar/plugins"
+var pluginFolder = os.Getenv("HOME") + "/.config/plakar/plugins"
 
 type Install struct {
 	subcommands.SubcommandBase

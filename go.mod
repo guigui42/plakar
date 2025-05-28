@@ -42,6 +42,7 @@ require (
 
 require (
 	github.com/DataDog/zstd v1.5.6 // indirect
+	github.com/Masterminds/semver/v3 v3.3.1 // indirect
 	github.com/PlakarKorp/go-cdc-chunkers v0.0.10 // indirect
 	github.com/alecthomas/chroma/v2 v2.15.0 // indirect
 	github.com/aws/aws-sdk-go v1.44.256 // indirect
