@@ -24,6 +24,7 @@ import (
 	"net/url"
 	"strconv"
 	"strings"
+	"sync"
 
 	"github.com/PlakarKorp/plakar/appcontext"
 	"github.com/PlakarKorp/plakar/objects"
@@ -46,6 +47,8 @@ type Store struct {
 	secretAccessKey string
 
 	storageClass string
+
+	bufPool sync.Pool
 
 	putObjectOptions minio.PutObjectOptions
 }
@@ -93,6 +96,12 @@ func NewStore(ctx *appcontext.AppContext, proto string, storeConfig map[string]s
 		useSsl:          useSsl,
 		storageClass:    storageClass,
 		ctx:             ctx,
+
+		bufPool: sync.Pool{
+			New: func() any {
+				return &bytes.Buffer{}
+			},
+		},
 
 		putObjectOptions: minio.PutObjectOptions{
 			// Some providers (eg. BlackBlaze) return the error
@@ -322,10 +331,19 @@ func (s *Store) GetPackfiles() ([]objects.MAC, error) {
 }
 
 func (s *Store) PutPackfile(mac objects.MAC, rd io.Reader) (int64, error) {
-	info, err := s.minioClient.PutObject(s.ctx, s.bucketName, s.realpath(fmt.Sprintf("packfiles/%02x/%016x", mac[0], mac)), rd, -1, s.putObjectOptions)
+	buf := s.bufPool.Get().(*bytes.Buffer)
+	copied, err := io.Copy(buf, rd)
+	if err != nil {
+		return 0, fmt.Errorf("read packfile: %w", err)
+	}
+
+	info, err := s.minioClient.PutObject(s.ctx, s.bucketName, s.realpath(fmt.Sprintf("packfiles/%02x/%016x", mac[0], mac)), buf, copied, s.putObjectOptions)
 	if err != nil {
 		return 0, fmt.Errorf("put object: %w", err)
 	}
+
+	buf.Reset()
+	s.bufPool.Put(buf)
 	return info.Size, nil
 }
 
