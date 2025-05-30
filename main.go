@@ -73,11 +73,11 @@ func EntryPoint() int {
 		fmt.Fprintf(os.Stderr, "%s\n", err)
 		return 1
 	}
-	cwd, err = utils.NormalizePath(cwd)
-	if err != nil {
-		fmt.Fprintf(os.Stderr, "%s\n", err)
-		return 1
-	}
+	// cwd, err = utils.NormalizePath(cwd)
+	// if err != nil {
+	// 	fmt.Fprintf(os.Stderr, "%s\n", err)
+	// 	return 1
+	// }
 
 	opt_cpuDefault := runtime.GOMAXPROCS(0)
 	if opt_cpuDefault != 1 {

@@ -19,8 +19,10 @@ package fs
 import (
 	"bytes"
 	"io"
+	"log"
 	"os"
 	"path/filepath"
+	"runtime"
 	"strings"
 	"sync"
 
@@ -96,17 +98,26 @@ func (f *FSImporter) walkDir_worker(jobs <-chan string, results chan<- *importer
 	}
 }
 
-func walkDir_addPrefixDirectories(rootDir string, jobs chan<- string, results chan<- *importer.ScanResult) {
-	atoms := strings.Split(rootDir, string(os.PathSeparator))
+func walkDir_addPrefixDirectories(root string, jobs chan<- string, results chan<- *importer.ScanResult) {
+	for {
+		log.Println("addprefix iter", root)
 
-	for i := range len(atoms) - 1 {
-		path := filepath.Join(atoms[0 : i+1]...)
-
-		if _, err := os.Stat(path); err != nil {
-			results <- importer.NewScanError(path, err)
+		if _, err := os.Stat(root); err != nil {
+			results <- importer.NewScanError(root, err)
 			continue
 		}
 
-		jobs <- path
+		jobs <- root
+
+		// Windows workaround: filepath.Dir("C:\") -> "C:\"
+		newroot := filepath.Dir(root)
+		if newroot == root || newroot == "/" {
+			break
+		}
+		root = newroot
+	}
+
+	if runtime.GOOS == "windows" {
+		jobs <- "/"
 	}
 }
