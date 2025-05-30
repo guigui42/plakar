@@ -72,17 +72,19 @@ func (f *FSImporter) walkDir_worker(jobs <-chan string, results chan<- *importer
 			}
 		}
 
-		ppath := filepath.ToSlash(path)
-		if !strings.HasPrefix(ppath, "/") {
-			ppath = "/" + ppath
+		// this is for windows paths:
+		// C:\User\Omar\plakar -> C:/User/Omar/Plakar -> /C:/User/Omar/Plakar
+		entrypath := filepath.ToSlash(path)
+		if !strings.HasPrefix(entrypath, "/") {
+			entrypath = "/" + entrypath
 		}
 
-		results <- importer.NewScanRecord(ppath, originFile, fileinfo, extendedAttributes,
+		results <- importer.NewScanRecord(entrypath, originFile, fileinfo, extendedAttributes,
 			func() (io.ReadCloser, error) {
 				return os.Open(path)
 			})
 		for _, attr := range extendedAttributes {
-			results <- importer.NewScanXattr(ppath, attr, objects.AttributeExtended,
+			results <- importer.NewScanXattr(entrypath, attr, objects.AttributeExtended,
 				func() (io.ReadCloser, error) {
 					data, err := xattr.Get(path, attr)
 					if err != nil {
