@@ -1,6 +1,3 @@
-//go:build !windows
-// +build !windows
-
 /*
  * Copyright (c) 2023 Gilles Chehade <gilles@poolp.org>
  *
@@ -74,12 +71,18 @@ func (f *FSImporter) walkDir_worker(jobs <-chan string, results chan<- *importer
 				continue
 			}
 		}
-		results <- importer.NewScanRecord(filepath.ToSlash(path), originFile, fileinfo, extendedAttributes,
+
+		ppath := filepath.ToSlash(path)
+		if !strings.HasPrefix(ppath, "/") {
+			ppath = "/" + ppath
+		}
+
+		results <- importer.NewScanRecord(ppath, originFile, fileinfo, extendedAttributes,
 			func() (io.ReadCloser, error) {
 				return os.Open(path)
 			})
 		for _, attr := range extendedAttributes {
-			results <- importer.NewScanXattr(filepath.ToSlash(path), attr, objects.AttributeExtended,
+			results <- importer.NewScanXattr(ppath, attr, objects.AttributeExtended,
 				func() (io.ReadCloser, error) {
 					data, err := xattr.Get(path, attr)
 					if err != nil {
@@ -96,10 +99,6 @@ func walkDir_addPrefixDirectories(rootDir string, jobs chan<- string, results ch
 
 	for i := range len(atoms) - 1 {
 		path := filepath.Join(atoms[0 : i+1]...)
-
-		if !strings.HasPrefix(path, "/") {
-			path = "/" + path
-		}
 
 		if _, err := os.Stat(path); err != nil {
 			results <- importer.NewScanError(path, err)
