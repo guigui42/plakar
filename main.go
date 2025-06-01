@@ -64,6 +64,7 @@ import (
 	_ "github.com/PlakarKorp/plakar/connectors/sftp"
 	_ "github.com/PlakarKorp/plakar/connectors/sqlite"
 	_ "github.com/PlakarKorp/plakar/connectors/stdio"
+	_ "github.com/PlakarKorp/plakar/connectors/tar"
 )
 
 func EntryPoint() int {
@@ -233,7 +234,7 @@ func EntryPoint() int {
 	}
 
 	// best effort check if security or reliability fix have been issued
-	if opt_disableSecurityCheck {
+	if !opt_disableSecurityCheck {
 		if rus, err := utils.CheckUpdate(ctx.CacheDir); err == nil {
 			if rus.SecurityFix || rus.ReliabilityFix {
 				concerns := ""
@@ -400,13 +401,13 @@ func EntryPoint() int {
 		setupEncryption(ctx, repoConfig, storeConfig)
 
 		if opt_agentless {
-			repo, err = repository.New(ctx.GetInner(), store, serializedConfig)
+			repo, err = repository.New(ctx.GetInner(), ctx.GetSecret(), store, serializedConfig)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "%s: %s\n", flag.CommandLine.Name(), err)
 				return 1
 			}
 		} else {
-			repo, err = repository.NewNoRebuild(ctx.GetInner(), store, serializedConfig)
+			repo, err = repository.NewNoRebuild(ctx.GetInner(), ctx.GetSecret(), store, serializedConfig)
 			if err != nil {
 				fmt.Fprintf(os.Stderr, "%s: %s\n", flag.CommandLine.Name(), err)
 				return 1

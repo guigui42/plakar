@@ -18,7 +18,6 @@ package stdio
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"os"
 	"path"
@@ -79,7 +78,7 @@ func (p *StdioImporter) stdioWalker_addPrefixDirectories(results chan<- *importe
 			Lusername:  "",
 			Lgroupname: "",
 		}
-		results <- importer.NewScanRecord(subpath, "", fi, nil)
+		results <- importer.NewScanRecord(subpath, "", fi, nil, nil)
 	}
 }
 
@@ -102,22 +101,11 @@ func (p *StdioImporter) Scan() (<-chan *importer.ScanResult, error) {
 			Lusername:  "",
 			Lgroupname: "",
 		}
-		results <- importer.NewScanRecord(p.fileDir, "", fi, nil)
+		results <- importer.NewScanRecord(p.fileDir, "", fi, nil,
+			func() (io.ReadCloser, error) { return os.Stdin, nil })
 	}()
 
 	return results, nil
-}
-
-func (p *StdioImporter) NewReader(pathname string) (io.ReadCloser, error) {
-	return os.Stdin, nil
-}
-
-func (p *StdioImporter) NewExtendedAttributeReader(pathname string, attribute string) (io.ReadCloser, error) {
-	return nil, fmt.Errorf("extended attributes are not supported on stdio")
-}
-
-func (p *StdioImporter) GetExtendedAttributes(pathname string) ([]importer.ExtendedAttributes, error) {
-	return nil, fmt.Errorf("extended attributes are not supported on stdio")
 }
 
 func (p *StdioImporter) Close() error {
