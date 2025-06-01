@@ -132,5 +132,3 @@ require (
 	modernc.org/mathutil v1.7.1 // indirect
 	modernc.org/memory v1.9.1 // indirect
 )
-
-replace github.com/PlakarKorp/kloset v1.0.1-beta.1.0.20250523083307-fbb1208bc57f => ../kloset
