@@ -68,6 +68,7 @@ func (cmd *Backup) Parse(ctx *appcontext.AppContext, args []string) error {
 	flags.BoolVar(&cmd.Quiet, "quiet", false, "suppress output")
 	flags.BoolVar(&cmd.Silent, "silent", false, "suppress ALL output")
 	flags.BoolVar(&cmd.OptCheck, "check", false, "check the snapshot after creating it")
+	flags.BoolVar(&cmd.OptDryRun, "dry-run", false, "do not actually create snapshot")
 	//flags.BoolVar(&opt_stdio, "stdio", false, "output one line per file to stdout instead of the default interactive output")
 	flags.Parse(args)
 
@@ -118,6 +119,7 @@ type Backup struct {
 	Quiet       bool
 	Path        string
 	OptCheck    bool
+	OptDryRun   bool
 }
 
 func (cmd *Backup) Execute(ctx *appcontext.AppContext, repo *repository.Repository) (int, error) {
@@ -158,6 +160,7 @@ func (cmd *Backup) DoBackup(ctx *appcontext.AppContext, repo *repository.Reposit
 		Name:           "default",
 		Tags:           tags,
 		Excludes:       excludes,
+		DryRun:         cmd.OptDryRun,
 	}
 
 	scanDir := ctx.CWD
