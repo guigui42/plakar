@@ -31,7 +31,7 @@ type FSExporter struct {
 }
 
 func init() {
-	exporter.Register("fs", NewFSExporter)
+	exporter.Register("ffs", NewFSExporter)
 }
 
 func NewFSExporter(appCtx context.Context, name string, config map[string]string) (exporter.Exporter, error) {

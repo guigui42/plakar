@@ -40,7 +40,7 @@ type Store struct {
 }
 
 func init() {
-	storage.Register(NewStore, "fs")
+	storage.Register(NewStore, "ffs")
 }
 
 func NewStore(ctx context.Context, proto string, storeConfig map[string]string) (storage.Store, error) {

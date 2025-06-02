@@ -44,7 +44,7 @@ type FSImporter struct {
 }
 
 func init() {
-	importer.Register("fs", NewFSImporter)
+	importer.Register("ffs", NewFSImporter)
 }
 
 func NewFSImporter(appCtx context.Context, name string, config map[string]string) (importer.Importer, error) {
