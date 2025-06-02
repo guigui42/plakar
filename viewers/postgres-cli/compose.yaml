@@ -27,3 +27,52 @@ services:
           psql -h db -U postgres -f \"$$f\" plakar;
         done
       "
+
+  pgadmin:
+    image: dpage/pgadmin4
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+    configs:
+      - source: servers.json
+        target: /pgadmin4/servers.json
+      - source: pgpass
+        target: /tmp/.pgpass
+    ports:
+      - "80"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+    entrypoint: >
+      /bin/sh -c "
+      mkdir -p /var/lib/pgadmin/storage/admin_admin.com/;
+      cp /tmp/.pgpass /var/lib/pgadmin/storage/admin_admin.com/.pgpass;
+      chown pgadmin:root /var/lib/pgadmin/storage/admin_admin.com/.pgpass;
+      chmod 600 /var/lib/pgadmin/storage/admin_admin.com/.pgpass;
+      /entrypoint.sh
+      "
+
+configs:
+  pgpass:
+    content: |
+      db:5432:*:postgres:plakar
+
+  servers.json:
+    content: |
+      {
+        "Servers": {
+          "1": {
+            "Name": "Plakar",
+            "Group": "Servers",
+            "Host": "db",
+            "Port": 5432,
+            "MaintenanceDB": "postgres",
+            "Username": "postgres",
+            "ConnectionParameters": {
+              "sslmode": "prefer",
+              "passfile": "/.pgpass"
+            }
+          }
+        }
+      }
