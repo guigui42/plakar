@@ -128,7 +128,19 @@ func (cmd *Backup) Execute(ctx *appcontext.AppContext, repo *repository.Reposito
 }
 
 func (cmd *Backup) DoBackup(ctx *appcontext.AppContext, repo *repository.Repository) (int, error, objects.MAC, error) {
-	snap, err := snapshot.Create(repo, repository.DefaultType)
+	var snap *snapshot.Builder
+	var err error
+	if cmd.OptDryRun {
+		identifier := objects.RandomMAC()
+		scanCache, err := repo.AppContext().GetCache().Scan(identifier)
+		if err != nil {
+			return 1, err, objects.MAC{}, nil
+		}
+		writer := repo.NewRepositoryWriter(scanCache, identifier, repository.DefaultType, true)
+		snap, err = snapshot.CreateWithRepositoryWriter(writer)
+	} else {
+		snap, err = snapshot.Create(repo, repository.DefaultType)
+	}
 	if err != nil {
 		ctx.GetLogger().Error("%s", err)
 		return 1, err, objects.MAC{}, nil
@@ -160,7 +172,6 @@ func (cmd *Backup) DoBackup(ctx *appcontext.AppContext, repo *repository.Reposit
 		Name:           "default",
 		Tags:           tags,
 		Excludes:       excludes,
-		DryRun:         cmd.OptDryRun,
 	}
 
 	scanDir := ctx.CWD

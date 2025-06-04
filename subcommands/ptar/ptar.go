@@ -247,7 +247,7 @@ func (cmd *Ptar) Execute(ctx *appcontext.AppContext, repo *repository.Repository
 		return 1, err
 	}
 
-	repoWriter := repo.NewRepositoryWriter(scanCache, identifier, repository.PtarType)
+	repoWriter := repo.NewRepositoryWriter(scanCache, identifier, repository.PtarType, false)
 	if len(cmd.SyncFrom) > 0 {
 		storeConfig, err := ctx.Config.GetRepository(cmd.SyncFrom)
 		if err != nil {
