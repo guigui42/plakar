@@ -34,7 +34,7 @@ func init() {
 	exporter.Register("fs", NewFSExporter)
 }
 
-func NewFSExporter(appCtx context.Context, name string, config map[string]string) (exporter.Exporter, error) {
+func NewFSExporter(appCtx context.Context, opts *exporter.ExporterOptions, name string, config map[string]string) (exporter.Exporter, error) {
 	return &FSExporter{
 		rootDir: strings.TrimPrefix(config["location"], "fs://"),
 	}, nil

@@ -37,7 +37,7 @@ func init() {
 	exporter.Register("sftp", NewSFTPExporter)
 }
 
-func NewSFTPExporter(appCtx context.Context, name string, config map[string]string) (exporter.Exporter, error) {
+func NewSFTPExporter(appCtx context.Context, opts *exporter.ExporterOptions, name string, config map[string]string) (exporter.Exporter, error) {
 	var err error
 
 	target := config["location"]

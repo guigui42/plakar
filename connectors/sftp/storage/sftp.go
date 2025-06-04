@@ -49,7 +49,7 @@ func init() {
 	storage.Register(NewStore, "sftp")
 }
 
-func NewStore(ctx context.Context, proto string, storeConfig map[string]string) (storage.Store, error) {
+func NewStore(ctx context.Context, opts *storage.StoreOptions, proto string, storeConfig map[string]string) (storage.Store, error) {
 	location := storeConfig["location"]
 	if location == "" {
 		return nil, fmt.Errorf("missing location")

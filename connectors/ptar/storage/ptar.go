@@ -56,7 +56,7 @@ func init() {
 	storage.Register(NewStore, "ptar")
 }
 
-func NewStore(ctx context.Context, proto string, storeConfig map[string]string) (storage.Store, error) {
+func NewStore(ctx context.Context, opts *storage.StoreOptions, proto string, storeConfig map[string]string) (storage.Store, error) {
 	return &Store{
 		location: storeConfig["location"],
 	}, nil

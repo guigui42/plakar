@@ -25,7 +25,7 @@ func TestExporter(t *testing.T) {
 	appCtx := appcontext.NewAppContext()
 
 	// Register the fs backen
-	exporterInstance, err = exporter.NewExporter(appCtx.GetInner(), map[string]string{"location": tmpExportDir})
+	exporterInstance, err = exporter.NewExporter(appCtx.GetInner(), nil, map[string]string{"location": tmpExportDir})
 	require.NoError(t, err)
 	defer exporterInstance.Close()
 

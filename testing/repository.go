@@ -42,7 +42,7 @@ func GenerateRepository(t *testing.T, bufout *bytes.Buffer, buferr *bytes.Buffer
 	ctx.Client = "plakar-test/1.0.0"
 
 	// create a storage
-	r, err := bfs.NewStore(ctx, "fs", map[string]string{"location": "fs://" + tmpRepoDir})
+	r, err := bfs.NewStore(ctx, nil, "fs", map[string]string{"location": "fs://" + tmpRepoDir})
 	require.NotNil(t, r)
 	require.NoError(t, err)
 	config := storage.NewConfiguration()
@@ -132,7 +132,7 @@ func GenerateRepositoryWithoutConfig(t *testing.T, bufout *bytes.Buffer, buferr 
 	ctx.MaxConcurrency = 1
 
 	// create a storage
-	r, err := bfs.NewStore(ctx, "fs", map[string]string{"location": tmpRepoDir})
+	r, err := bfs.NewStore(ctx, nil, "fs", map[string]string{"location": tmpRepoDir})
 	require.NotNil(t, r)
 	require.NoError(t, err)
 	config := storage.NewConfiguration()

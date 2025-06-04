@@ -30,7 +30,7 @@ func TestExporter(t *testing.T) {
 
 	var exporterInstance exporter.Exporter
 	appCtx := appcontext.NewAppContext()
-	exporterInstance, err = exporter.NewExporter(appCtx.GetInner(), map[string]string{"location": tmpExportBucket, "access_key": "", "secret_access_key": "", "use_tls": "false"})
+	exporterInstance, err = exporter.NewExporter(appCtx.GetInner(), nil, map[string]string{"location": tmpExportBucket, "access_key": "", "secret_access_key": "", "use_tls": "false"})
 	require.NoError(t, err)
 	defer exporterInstance.Close()
 

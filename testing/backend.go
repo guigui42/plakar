@@ -17,7 +17,7 @@ import (
 )
 
 func init() {
-	storage.Register(func(ctx context.Context, proto string, storeConfig map[string]string) (storage.Store, error) {
+	storage.Register(func(ctx context.Context, opts *storage.StoreOptions, proto string, storeConfig map[string]string) (storage.Store, error) {
 		return &MockBackend{location: storeConfig["location"]}, nil
 	}, "mock")
 }

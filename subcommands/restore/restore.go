@@ -169,7 +169,7 @@ func (cmd *Restore) Execute(ctx *appcontext.AppContext, repo *repository.Reposit
 
 	var exporterInstance exporter.Exporter
 	var err error
-	exporterInstance, err = exporter.NewExporter(ctx.GetInner(), exporterConfig)
+	exporterInstance, err = exporter.NewExporter(ctx.GetInner(), nil, exporterConfig)
 	if err != nil {
 		return 1, err
 	}

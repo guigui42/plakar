@@ -38,7 +38,7 @@ func init() {
 	exporter.Register("stderr", NewStdioExporter)
 }
 
-func NewStdioExporter(appCtx context.Context, name string, config map[string]string) (exporter.Exporter, error) {
+func NewStdioExporter(appCtx context.Context, opts *exporter.ExporterOptions, name string, config map[string]string) (exporter.Exporter, error) {
 	var w io.Writer
 
 	switch name {

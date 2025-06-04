@@ -47,7 +47,7 @@ func init() {
 	storage.Register(NewStore, "sqlite")
 }
 
-func NewStore(ctx context.Context, proto string, storeConfig map[string]string) (storage.Store, error) {
+func NewStore(ctx context.Context, opts *storage.StoreOptions, proto string, storeConfig map[string]string) (storage.Store, error) {
 	if proto != "sqlite" {
 		return nil, fmt.Errorf("unsupported database backend: %s", proto)
 	}

@@ -40,7 +40,7 @@ func TestExporter(t *testing.T) {
 
 	// Create the exporter
 	appCtx := appcontext.NewAppContext()
-	exporter, err := NewSFTPExporter(appCtx, "sftp", map[string]string{
+	exporter, err := NewSFTPExporter(appCtx, nil, "sftp", map[string]string{
 		"location":                 "sftp://" + server.Addr + "/",
 		"username":                 "test",
 		"identity":                 server.KeyFile,

@@ -23,7 +23,7 @@ func TestDatabaseBackend(t *testing.T) {
 		os.Remove("/tmp/testdb.db")
 	})
 	// create a repository
-	repo, err := NewStore(ctx, "sqlite", map[string]string{"location": "/tmp/testdb.db"})
+	repo, err := NewStore(ctx, nil, "sqlite", map[string]string{"location": "/tmp/testdb.db"})
 	if err != nil {
 		t.Fatal("error creating repository", err)
 	}
