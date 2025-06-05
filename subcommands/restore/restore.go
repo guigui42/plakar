@@ -23,7 +23,6 @@ import (
 	"time"
 
 	"github.com/PlakarKorp/kloset/repository"
-	"github.com/PlakarKorp/kloset/snapshot"
 	"github.com/PlakarKorp/kloset/snapshot/exporter"
 	"github.com/PlakarKorp/plakar/appcontext"
 	"github.com/PlakarKorp/plakar/subcommands"
@@ -171,16 +170,15 @@ func (cmd *Restore) Execute(ctx *appcontext.AppContext, repo *repository.Reposit
 		}
 	}
 
-	var exporterInstance exporter.Exporter
-	var err error
-	exporterInstance, err = exporter.NewExporter(ctx.GetInner(), exporterConfig)
+	exp, err := exporter.NewExporter(ctx.GetInner(), exporterConfig)
 	if err != nil {
 		return 1, err
 	}
-	defer exporterInstance.Close()
+	defer exp.Close()
 
-	opts := &snapshot.RestoreOptions{
+	opts := &exporter.ExporterOptions{
 		MaxConcurrency: cmd.Concurrency,
+		Events:         ctx.Events(),
 	}
 
 	for _, snapPath := range snapshots {
@@ -188,10 +186,17 @@ func (cmd *Restore) Execute(ctx *appcontext.AppContext, repo *repository.Reposit
 		if err != nil {
 			return 1, err
 		}
+		opts.SnapID = snap.Header.Identifier
 		opts.Strip = snap.Header.GetSource(0).Importer.Directory
+		opts.Base = exp.Root()
+		opts.Pathname = pathname
 
-		err = snap.Restore(exporterInstance, exporterInstance.Root(), pathname, opts)
+		fs, err := snap.Filesystem()
+		if err != nil {
+			return 1, err
+		}
 
+		err = exp.Export(ctx, opts, fs)
 		if err != nil {
 			return 1, err
 		}

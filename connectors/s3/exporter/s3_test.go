@@ -1,13 +1,12 @@
 package s3
 
 import (
+	"context"
 	"net/http/httptest"
 	"os"
 	"testing"
 
 	"github.com/PlakarKorp/kloset/objects"
-	"github.com/PlakarKorp/kloset/snapshot/exporter"
-	"github.com/PlakarKorp/plakar/appcontext"
 	"github.com/johannesboyne/gofakes3"
 	"github.com/johannesboyne/gofakes3/backend/s3mem"
 	"github.com/stretchr/testify/require"
@@ -28,13 +27,19 @@ func TestExporter(t *testing.T) {
 
 	tmpExportBucket := "s3://" + ts.Listener.Addr().String() + "/bucket"
 
-	var exporterInstance exporter.Exporter
-	appCtx := appcontext.NewAppContext()
-	exporterInstance, err = exporter.NewExporter(appCtx.GetInner(), map[string]string{"location": tmpExportBucket, "access_key": "", "secret_access_key": "", "use_tls": "false"})
+	ctx := context.Background()
+	exp, err := NewS3Exporter(ctx, "s3", map[string]string{
+		"location":          tmpExportBucket,
+		"access_key":        "",
+		"secret_access_key": "",
+		"use_tls":           "false",
+	})
 	require.NoError(t, err)
-	defer exporterInstance.Close()
+	defer exp.Close()
 
-	require.Equal(t, "/bucket", exporterInstance.Root())
+	require.Equal(t, "/bucket", exp.Root())
+
+	exporterInstance := exp.(*S3Exporter)
 
 	data := []byte("test exporter s3")
 	datalen := int64(len(data))

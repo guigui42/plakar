@@ -1,11 +1,11 @@
 package sftp
 
 import (
+	"context"
 	"os"
 	"path/filepath"
 	"testing"
 
-	"github.com/PlakarKorp/plakar/appcontext"
 	"github.com/PlakarKorp/kloset/objects"
 	ptesting "github.com/PlakarKorp/plakar/testing"
 )
@@ -38,9 +38,9 @@ func TestExporter(t *testing.T) {
 		}
 	}
 
-	// Create the exporter
-	appCtx := appcontext.NewAppContext()
-	exporter, err := NewSFTPExporter(appCtx, "sftp", map[string]string{
+	ctx := context.Background()
+
+	exp, err := NewSFTPExporter(ctx, "sftp", map[string]string{
 		"location":                 "sftp://" + server.Addr + "/",
 		"username":                 "test",
 		"identity":                 server.KeyFile,
@@ -49,13 +49,15 @@ func TestExporter(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create exporter: %v", err)
 	}
-	defer exporter.Close()
+	defer exp.Close()
 
 	// Test root path
-	root := exporter.Root()
+	root := exp.Root()
 	if root != "/" {
 		t.Errorf("Expected root path '/', got '%s'", root)
 	}
+
+	exporter := exp.(*SFTPExporter)
 
 	// Test creating directories
 	dirs := []string{"dir1", "dir2", "dir3"}

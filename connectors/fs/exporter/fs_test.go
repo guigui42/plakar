@@ -1,13 +1,12 @@
 package fs
 
 import (
+	"context"
 	"io"
 	"os"
 	"testing"
 
 	"github.com/PlakarKorp/kloset/objects"
-	"github.com/PlakarKorp/kloset/snapshot/exporter"
-	"github.com/PlakarKorp/plakar/appcontext"
 	"github.com/stretchr/testify/require"
 )
 
@@ -21,15 +20,16 @@ func TestExporter(t *testing.T) {
 		os.RemoveAll(tmpOriginDir)
 	})
 
-	var exporterInstance exporter.Exporter
-	appCtx := appcontext.NewAppContext()
+	ctx := context.Background()
 
 	// Register the fs backen
-	exporterInstance, err = exporter.NewExporter(appCtx.GetInner(), map[string]string{"location": tmpExportDir})
+	exp, err := NewFSExporter(ctx, "fs", map[string]string{"location": tmpExportDir})
 	require.NoError(t, err)
-	defer exporterInstance.Close()
+	defer exp.Close()
 
-	require.Equal(t, tmpExportDir, exporterInstance.Root())
+	require.Equal(t, tmpExportDir, exp.Root())
+
+	exporterInstance := exp.(*FSExporter)
 
 	data := []byte("test exporter fs")
 	datalen := int64(len(data))

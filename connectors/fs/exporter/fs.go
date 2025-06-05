@@ -24,6 +24,7 @@ import (
 
 	"github.com/PlakarKorp/kloset/objects"
 	"github.com/PlakarKorp/kloset/snapshot/exporter"
+	"github.com/PlakarKorp/kloset/snapshot/vfs"
 )
 
 type FSExporter struct {
@@ -42,6 +43,10 @@ func NewFSExporter(appCtx context.Context, name string, config map[string]string
 
 func (p *FSExporter) Root() string {
 	return p.rootDir
+}
+
+func (p *FSExporter) Export(ctx context.Context, opts *exporter.ExporterOptions, fs *vfs.Filesystem) error {
+	return exporter.Export(ctx, p, opts, fs)
 }
 
 func (p *FSExporter) CreateDirectory(pathname string) error {

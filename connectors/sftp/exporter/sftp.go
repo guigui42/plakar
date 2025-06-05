@@ -24,6 +24,7 @@ import (
 
 	"github.com/PlakarKorp/kloset/objects"
 	"github.com/PlakarKorp/kloset/snapshot/exporter"
+	"github.com/PlakarKorp/kloset/snapshot/vfs"
 	plakarsftp "github.com/PlakarKorp/plakar/sftp"
 	"github.com/pkg/sftp"
 )
@@ -59,8 +60,11 @@ func NewSFTPExporter(appCtx context.Context, name string, config map[string]stri
 }
 
 func (p *SFTPExporter) Root() string {
-
 	return p.location
+}
+
+func (p *SFTPExporter) Export(ctx context.Context, opts *exporter.ExporterOptions, fs *vfs.Filesystem) error {
+	return exporter.Export(ctx, p, opts, fs)
 }
 
 func (p *SFTPExporter) CreateDirectory(pathname string) error {

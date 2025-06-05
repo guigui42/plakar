@@ -25,6 +25,7 @@ import (
 
 	"github.com/PlakarKorp/kloset/objects"
 	"github.com/PlakarKorp/kloset/snapshot/exporter"
+	"github.com/PlakarKorp/kloset/snapshot/vfs"
 )
 
 type StdioExporter struct {
@@ -59,6 +60,10 @@ func NewStdioExporter(appCtx context.Context, name string, config map[string]str
 
 func (p *StdioExporter) Root() string {
 	return "/"
+}
+
+func (p *StdioExporter) Export(ctx context.Context, opts *exporter.ExporterOptions, fs *vfs.Filesystem) error {
+	return exporter.Export(ctx, p, opts, fs)
 }
 
 func (p *StdioExporter) CreateDirectory(pathname string) error {
