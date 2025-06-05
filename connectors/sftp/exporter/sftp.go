@@ -59,8 +59,8 @@ func NewSFTPExporter(appCtx context.Context, name string, config map[string]stri
 	}, nil
 }
 
-func (p *SFTPExporter) Export(ctx context.Context, vfs *vfs.Filesystem) error {
-	return nil
+func (p *SFTPExporter) Export(ctx context.Context, opts *exporter.ExporterOptions, vfs *vfs.Filesystem) error {
+	return exporter.Export(ctx, p, opts, vfs)
 }
 
 func (p *SFTPExporter) Root() string {

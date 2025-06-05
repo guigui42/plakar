@@ -81,8 +81,8 @@ func NewFTPExporter(appCtx context.Context, name string, config map[string]strin
 	}, nil
 }
 
-func (p *FTPExporter) Export(ctx context.Context, vfs *vfs.Filesystem) error {
-	return nil
+func (p *FTPExporter) Export(ctx context.Context, opts *exporter.ExporterOptions, base string, vfs *vfs.Filesystem) error {
+	return exporter.Export(ctx, p, opts, vfs)
 }
 
 func (p *FTPExporter) Root() string {

@@ -41,8 +41,8 @@ func NewFSExporter(appCtx context.Context, name string, config map[string]string
 	}, nil
 }
 
-func (p *FSExporter) Export(ctx context.Context, vfs *vfs.Filesystem) error {
-	return nil
+func (p *FSExporter) Export(ctx context.Context, opts *exporter.ExporterOptions, base string, vfs *vfs.Filesystem) error {
+	return exporter.Export(ctx, base, p, opts, vfs)
 }
 
 func (p *FSExporter) Root() string {

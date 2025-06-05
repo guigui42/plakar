@@ -101,8 +101,8 @@ func NewS3Exporter(ctx context.Context, name string, config map[string]string) (
 	}, nil
 }
 
-func (p *S3Exporter) Export(ctx context.Context, vfs *vfs.Filesystem) error {
-	return nil
+func (p *S3Exporter) Export(ctx context.Context, opts *exporter.ExporterOptions, vfs *vfs.Filesystem) error {
+	return exporter.Export(ctx, p, opts, vfs)
 }
 
 func (p *S3Exporter) Root() string {

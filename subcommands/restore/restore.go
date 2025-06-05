@@ -19,11 +19,12 @@ package restore
 import (
 	"flag"
 	"fmt"
+	"path"
 	"strings"
 	"time"
 
+	"github.com/PlakarKorp/kloset/events"
 	"github.com/PlakarKorp/kloset/repository"
-	"github.com/PlakarKorp/kloset/snapshot"
 	"github.com/PlakarKorp/kloset/snapshot/exporter"
 	"github.com/PlakarKorp/plakar/appcontext"
 	"github.com/PlakarKorp/plakar/subcommands"
@@ -44,7 +45,7 @@ func (cmd *Restore) Parse(ctx *appcontext.AppContext, args []string) error {
 		flags.PrintDefaults()
 	}
 
-	flags.Uint64Var(&cmd.Concurrency, "concurrency", uint64(ctx.MaxConcurrency), "maximum number of parallel tasks")
+	flags.Uint64Var(&cmd.Concurrency, "concurrency", 0, "maximum number of parallel tasks")
 	flags.StringVar(&cmd.OptName, "name", "", "filter by name")
 	flags.StringVar(&cmd.OptCategory, "category", "", "filter by category")
 	flags.StringVar(&cmd.OptEnvironment, "environment", "", "filter by environment")
@@ -72,6 +73,10 @@ func (cmd *Restore) Parse(ctx *appcontext.AppContext, args []string) error {
 	cmd.RepositorySecret = ctx.GetSecret()
 	cmd.Target = pullPath
 	cmd.Snapshots = flags.Args()
+
+	if cmd.Concurrency == 0 {
+		cmd.Concurrency = uint64(ctx.MaxConcurrency)
+	}
 
 	return nil
 }
@@ -175,8 +180,9 @@ func (cmd *Restore) Execute(ctx *appcontext.AppContext, repo *repository.Reposit
 	}
 	defer exporterInstance.Close()
 
-	opts := &snapshot.RestoreOptions{
+	opts := &exporter.ExporterOptions{
 		MaxConcurrency: cmd.Concurrency,
+		Events: ctx.Events(),
 	}
 
 	for _, snapPath := range snapshots {
@@ -185,19 +191,21 @@ func (cmd *Restore) Execute(ctx *appcontext.AppContext, repo *repository.Reposit
 			return 1, err
 		}
 		opts.Strip = snap.Header.GetSource(0).Importer.Directory
+		opts.SnapID = snap.Header.Identifier
+
+		pathname = path.Clean(pathname)
+		if pathname != "/" && !strings.HasSuffix(pathname, "/") {
+			pathname = pathname + "/"
+		}
 
 		vfs, err := snap.Filesystem()
 		if err != nil {
 			return 1, err
 		}
-		if pathname != "/" {
-			vfs, err = vfs.Chroot(pathname)
-			if err != nil {
-				return 1, err
-			}
-		}
 
-		err = snap.Restore(exporterInstance, exporterInstance.Root(), pathname, opts)
+		snap.Event(events.StartEvent())
+		err = exporterInstance.Export(ctx, pathname, opts, vfs)
+		snap.Event(events.DoneEvent())
 
 		if err != nil {
 			return 1, err

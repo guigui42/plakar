@@ -58,8 +58,8 @@ func NewStdioExporter(appCtx context.Context, name string, config map[string]str
 	}, nil
 }
 
-func (p *StdioExporter) Export(ctx context.Context, vfs *vfs.Filesystem) error {
-	return nil
+func (p *StdioExporter) Export(ctx context.Context, opts *exporter.ExporterOptions, vfs *vfs.Filesystem) error {
+	return exporter.Export(ctx, p, opts, vfs)
 }
 
 func (p *StdioExporter) Root() string {
