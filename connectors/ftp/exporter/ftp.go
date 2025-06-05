@@ -25,6 +25,7 @@ import (
 
 	"github.com/PlakarKorp/kloset/objects"
 	"github.com/PlakarKorp/kloset/snapshot/exporter"
+	"github.com/PlakarKorp/kloset/snapshot/vfs"
 	"github.com/secsy/goftp"
 )
 
@@ -78,6 +79,10 @@ func NewFTPExporter(appCtx context.Context, name string, config map[string]strin
 		rootDir: parsed.Path,
 		client:  client,
 	}, nil
+}
+
+func (p *FTPExporter) Export(ctx context.Context, vfs *vfs.Filesystem) error {
+	return nil
 }
 
 func (p *FTPExporter) Root() string {

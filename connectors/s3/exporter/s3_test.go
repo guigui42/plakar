@@ -28,11 +28,12 @@ func TestExporter(t *testing.T) {
 
 	tmpExportBucket := "s3://" + ts.Listener.Addr().String() + "/bucket"
 
-	var exporterInstance exporter.Exporter
 	appCtx := appcontext.NewAppContext()
-	exporterInstance, err = exporter.NewExporter(appCtx.GetInner(), map[string]string{"location": tmpExportBucket, "access_key": "", "secret_access_key": "", "use_tls": "false"})
+	exp, err := exporter.NewExporter(appCtx.GetInner(), map[string]string{"location": tmpExportBucket, "access_key": "", "secret_access_key": "", "use_tls": "false"})
 	require.NoError(t, err)
-	defer exporterInstance.Close()
+	defer exp.Close()
+
+	exporterInstance := exp.(exporter.FSExporter)
 
 	require.Equal(t, "/bucket", exporterInstance.Root())
 

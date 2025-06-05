@@ -186,6 +186,17 @@ func (cmd *Restore) Execute(ctx *appcontext.AppContext, repo *repository.Reposit
 		}
 		opts.Strip = snap.Header.GetSource(0).Importer.Directory
 
+		vfs, err := snap.Filesystem()
+		if err != nil {
+			return 1, err
+		}
+		if pathname != "/" {
+			vfs, err = vfs.Chroot(pathname)
+			if err != nil {
+				return 1, err
+			}
+		}
+
 		err = snap.Restore(exporterInstance, exporterInstance.Root(), pathname, opts)
 
 		if err != nil {

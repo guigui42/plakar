@@ -26,6 +26,7 @@ import (
 
 	"github.com/PlakarKorp/kloset/objects"
 	"github.com/PlakarKorp/kloset/snapshot/exporter"
+	"github.com/PlakarKorp/kloset/snapshot/vfs"
 	"github.com/minio/minio-go/v7"
 	"github.com/minio/minio-go/v7/pkg/credentials"
 )
@@ -98,6 +99,10 @@ func NewS3Exporter(ctx context.Context, name string, config map[string]string) (
 		minioClient: conn,
 		ctx:         ctx,
 	}, nil
+}
+
+func (p *S3Exporter) Export(ctx context.Context, vfs *vfs.Filesystem) error {
+	return nil
 }
 
 func (p *S3Exporter) Root() string {
