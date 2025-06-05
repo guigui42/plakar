@@ -44,7 +44,7 @@ func (cmd *Restore) Parse(ctx *appcontext.AppContext, args []string) error {
 		flags.PrintDefaults()
 	}
 
-	flags.Uint64Var(&cmd.Concurrency, "concurrency", uint64(ctx.MaxConcurrency), "maximum number of parallel tasks")
+	flags.Uint64Var(&cmd.Concurrency, "concurrency", 0, "maximum number of parallel tasks")
 	flags.StringVar(&cmd.OptName, "name", "", "filter by name")
 	flags.StringVar(&cmd.OptCategory, "category", "", "filter by category")
 	flags.StringVar(&cmd.OptEnvironment, "environment", "", "filter by environment")
@@ -72,6 +72,10 @@ func (cmd *Restore) Parse(ctx *appcontext.AppContext, args []string) error {
 	cmd.RepositorySecret = ctx.GetSecret()
 	cmd.Target = pullPath
 	cmd.Snapshots = flags.Args()
+
+	if cmd.Concurrency == 0 {
+		cmd.Concurrency = uint64(ctx.MaxConcurrency)
+	}
 
 	return nil
 }
