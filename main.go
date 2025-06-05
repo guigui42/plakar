@@ -21,7 +21,6 @@ import (
 	"github.com/PlakarKorp/kloset/encryption"
 	"github.com/PlakarKorp/kloset/logging"
 	"github.com/PlakarKorp/kloset/repository"
-	"github.com/PlakarKorp/kloset/plugins"
 	"github.com/PlakarKorp/kloset/storage"
 	"github.com/PlakarKorp/kloset/versioning"
 	"github.com/PlakarKorp/plakar/agent"
@@ -29,6 +28,7 @@ import (
 	"github.com/PlakarKorp/plakar/subcommands"
 	"github.com/PlakarKorp/plakar/task"
 	"github.com/PlakarKorp/plakar/utils"
+	"github.com/PlakarKorp/plakar/plugins"
 	"github.com/denisbrodbeck/machineid"
 	"github.com/google/uuid"
 
