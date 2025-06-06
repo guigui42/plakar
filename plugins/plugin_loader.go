@@ -164,11 +164,12 @@ func LoadBackends(ctx context.Context, pluginPath string) error {
 					return nil, fmt.Errorf("socket not ready: %w", err)
 				}
 
-				client, err := grpc.NewClient("unix://"+unixSocketPath,
-				grpc.WithTransportCredentials(insecure.NewCredentials()),
-				grpc.WithContextDialer(func(ctx context.Context, addr string) (net.Conn, error) {
-					return net.Dial("unix", unixSocketPath)
-				}))
+				client, err := grpc.NewClient(
+					"unix://"+unixSocketPath,
+					grpc.WithTransportCredentials(insecure.NewCredentials()),
+					grpc.WithContextDialer(func(ctx context.Context, addr string) (net.Conn, error) {
+						return net.Dial("unix", unixSocketPath)
+					}))
 				if err != nil {
 					return nil, err
 				}
