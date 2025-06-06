@@ -7,7 +7,7 @@ import (
 	"os"
 	"path/filepath"
 	"regexp"
-	"syscall"
+	"os/exec"
 	"time"
 
 	"github.com/PlakarKorp/kloset/snapshot/importer"
@@ -153,7 +153,7 @@ func LoadBackends(ctx context.Context, pluginPath string) error {
 				return fmt.Errorf("unknown plugin type: %s", typeName)
 			}
 			wrappedFunc := pType.Wrap(func(ctx context.Context, _ *any, name string, config map[string]string) (any, error) {
-				err := forkChild(filepath.Join(pluginFolderPath, pluginFileName), config)
+				err := execPlugin(filepath.Join(pluginFolderPath, pluginFileName), config)
 				if err != nil {
 					return nil, fmt.Errorf("failed to fork child: %w", err)
 				}
@@ -181,12 +181,14 @@ func LoadBackends(ctx context.Context, pluginPath string) error {
 	return nil
 }
 
-func forkChild(pluginPath string, config map[string]string) (error) {
-	argv := []string{pluginPath, fmt.Sprintf("%v", config)}
-	_, err := syscall.ForkExec(pluginPath, argv, nil)
-	if err != nil {
-		return fmt.Errorf("failed to ForkExec: %w", err)
-	}
+func execPlugin(pluginPath string, config map[string]string) error {
+	argv := []string{fmt.Sprintf("%v", config)}
+	cmd := exec.Command(pluginPath, argv...)
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
 
+	if err := cmd.Start(); err != nil {
+		return fmt.Errorf("failed to start process: %w", err)
+	}
 	return nil
 }
