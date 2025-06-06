@@ -146,23 +146,19 @@ func LoadBackends(ctx context.Context, pluginPath string) error {
 			}
 			key := matches[1]
 			pluginFileName := matches[0]
+			typeName := pluginEntry.Name()
 
-			pType, ok := pTypes[pluginEntry.Name()]
+			pType, ok := pTypes[typeName]
 			if !ok {
-				return fmt.Errorf("unknown plugin type: %s", pluginEntry.Name())
+				return fmt.Errorf("unknown plugin type: %s", typeName)
 			}
 			wrappedFunc := pType.Wrap(func(ctx context.Context, _ *any, name string, config map[string]string) (any, error) {
-				_, connFd, err := forkChild(filepath.Join(pluginFolderPath, pluginFileName), config)
+				err := forkChild(filepath.Join(pluginFolderPath, pluginFileName), config)
 				if err != nil {
 					return nil, fmt.Errorf("failed to fork child: %w", err)
 				}
-				connFp := os.NewFile(uintptr(connFd), "grpc-conn")
-				_, err = net.FileConn(connFp)
-				if err != nil {
-					return nil, fmt.Errorf("failed to create file conn: %w", err)
-				}
 
-				unixSocketPath := filepath.Join(os.TempDir(), fmt.Sprintf("%s.sock", key))
+				unixSocketPath := filepath.Join(os.TempDir(), fmt.Sprintf("%s.sock", typeName))
 
 				if err := waitForSocket(unixSocketPath, 3*time.Second); err != nil {
 					return nil, fmt.Errorf("socket not ready: %w", err)
@@ -185,31 +181,12 @@ func LoadBackends(ctx context.Context, pluginPath string) error {
 	return nil
 }
 
-func forkChild(pluginPath string, config map[string]string) (int, int, error) {
-	sp, err := syscall.Socketpair(syscall.AF_LOCAL, syscall.SOCK_STREAM, syscall.AF_UNSPEC)
-	if err != nil {
-		return -1, -1, fmt.Errorf("failed to create socketpair: %w", err)
-	}
-
-	procAttr := syscall.ProcAttr{}
-	procAttr.Files = []uintptr{
-		os.Stdin.Fd(),
-		os.Stdout.Fd(),
-		os.Stderr.Fd(),
-		uintptr(sp[0]),
-	}
-
-	var pid int
-
+func forkChild(pluginPath string, config map[string]string) (error) {
 	argv := []string{pluginPath, fmt.Sprintf("%v", config)}
-	pid, err = syscall.ForkExec(pluginPath, argv, &procAttr)
+	_, err := syscall.ForkExec(pluginPath, argv, nil)
 	if err != nil {
-		return -1, -1, fmt.Errorf("failed to ForkExec: %w", err)
+		return fmt.Errorf("failed to ForkExec: %w", err)
 	}
 
-	if syscall.Close(sp[0]) != nil {
-		return -1, -1, fmt.Errorf("failed to close socket: %w", err)
-	}
-
-	return pid, sp[1], nil
+	return nil
 }
