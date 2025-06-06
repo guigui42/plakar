@@ -8,6 +8,7 @@ import (
 	"path/filepath"
 	"regexp"
 	"syscall"
+	"time"
 
 	"github.com/PlakarKorp/kloset/snapshot/importer"
 	grpc_importer "github.com/PlakarKorp/kloset/snapshot/importer/pkg"
@@ -43,13 +44,13 @@ func wrap[T any, O any](fn any) func(context.Context, *O, string, map[string]str
 
 type PluginType interface {
 	Register(name string, fn any)
-	GrpcClient(client grpc.ClientConnInterface) any
+	GrpcClient(client string) any
 	Wrap(fn any) any
 }
 
 type pluginTypes[T any, O any] struct {
 	registerFn func(name string, fn func(context.Context, *O, string, map[string]string) (T, error))
-	grpcClient func(client grpc.ClientConnInterface) T
+	grpcClient func(unixSocketPath string) T
 }
 
 func (p *pluginTypes[T, O]) Register(name string, fn any) {
@@ -60,8 +61,8 @@ func (p *pluginTypes[T, O]) Register(name string, fn any) {
 	p.registerFn(name, typedFn)
 }
 
-func (p *pluginTypes[T, O]) GrpcClient(client grpc.ClientConnInterface) any {
-	return p.grpcClient(client)
+func (p *pluginTypes[T, O]) GrpcClient(unixSocketPath string) any {
+	return p.grpcClient(unixSocketPath)
 }
 
 func (p *pluginTypes[T, O]) Wrap(fn any) any {
@@ -73,9 +74,20 @@ var pTypes = map[string]PluginType{
 		registerFn: func(name string, fn func(context.Context, *importer.ImporterOptions, string, map[string]string) (importer.Importer, error)) {
 			importer.Register(name, fn)
 		},
-		grpcClient: func(client grpc.ClientConnInterface) importer.Importer {
+		grpcClient: func(unixSocketPath string) importer.Importer {
+			client, err := grpc.NewClient("unix://"+unixSocketPath,
+				grpc.WithTransportCredentials(insecure.NewCredentials()),
+				grpc.WithContextDialer(func(ctx context.Context, addr string) (net.Conn, error) {
+					return net.Dial("unix", unixSocketPath)
+				}),
+			)
+			if err != nil {
+				fmt.Printf("failed to create gRPC client: %v\n", err)
+				return nil
+			}
 			return &importer.GrpcImporter{
-				GrpcClient: grpc_importer.NewImporterClient(client),
+				GrpcClientScan:   grpc_importer.NewImporterClient(client),
+				GrpcClientReader: grpc_importer.NewImporterClient(client),
 			}
 		},
 	},
@@ -83,7 +95,17 @@ var pTypes = map[string]PluginType{
 		registerFn: func(name string, fn func(context.Context, *exporter.ExporterOptions, string, map[string]string) (exporter.Exporter, error)) {
 			exporter.Register(name, fn)
 		},
-		grpcClient: func(client grpc.ClientConnInterface) exporter.Exporter {
+		grpcClient: func(unixSocketPath string) exporter.Exporter {
+			client, err := grpc.NewClient("unix://"+unixSocketPath,
+				grpc.WithTransportCredentials(insecure.NewCredentials()),
+				grpc.WithContextDialer(func(ctx context.Context, addr string) (net.Conn, error) {
+					return net.Dial("unix", unixSocketPath)
+				}),
+			)
+			if err != nil {
+				fmt.Printf("failed to create gRPC client: %v\n", err)
+				return nil
+			}
 			return &exporter.GrpcExporter{
 				GrpcClient: grpc_exporter.NewExporterClient(client),
 			}
@@ -93,7 +115,17 @@ var pTypes = map[string]PluginType{
 		registerFn: func(name string, fn func(context.Context, *storage.StoreOptions, string, map[string]string) (storage.Store, error)) {
 			storage.Register(fn, name)
 		},
-		grpcClient: func(client grpc.ClientConnInterface) storage.Store {
+		grpcClient: func(unixSocketPath string) storage.Store {
+			client, err := grpc.NewClient("unix://"+unixSocketPath,
+				grpc.WithTransportCredentials(insecure.NewCredentials()),
+				grpc.WithContextDialer(func(ctx context.Context, addr string) (net.Conn, error) {
+					return net.Dial("unix", unixSocketPath)
+				}),
+			)
+			if err != nil {
+				fmt.Printf("failed to create gRPC client: %v\n", err)
+				return nil
+			}
 			return &storage.GrpcStorage{
 				GrpcClient: grpc_storage.NewStoreClient(client),
 			}
@@ -101,6 +133,22 @@ var pTypes = map[string]PluginType{
 	},
 }
 
+func waitForSocket(path string, timeout time.Duration) error {
+	deadline := time.Now().Add(timeout)
+	for {
+		if time.Now().After(deadline) {
+			return fmt.Errorf("timeout waiting for socket at %s", path)
+		}
+		if _, err := os.Stat(path); err == nil {
+			conn, err := net.Dial("unix", path)
+			if err == nil {
+				conn.Close()
+				return nil // socket ready and accepting
+			}
+		}
+		time.Sleep(50 * time.Millisecond)
+	}
+}
 
 func LoadBackends(ctx context.Context, pluginPath string) error {
 	dirEntries, err := os.ReadDir(pluginPath)
@@ -139,27 +187,24 @@ func LoadBackends(ctx context.Context, pluginPath string) error {
 					return nil, fmt.Errorf("failed to fork child: %w", err)
 				}
 				connFp := os.NewFile(uintptr(connFd), "grpc-conn")
-				conn, err := net.FileConn(connFp)
+				_, err = net.FileConn(connFp)
 				if err != nil {
 					return nil, fmt.Errorf("failed to create file conn: %w", err)
 				}
-				client, err := grpc.NewClient("127.0.0.1:0",
-					grpc.WithTransportCredentials(insecure.NewCredentials()),
-					grpc.WithContextDialer(func(ctx context.Context, addr string) (net.Conn, error) {
-						return conn, nil
-					}),
-				)
-				if err != nil {
-					return nil, fmt.Errorf("failed to create client context: %w", err)
+
+				unixSocketPath := "/tmp/importer.sock"
+
+				if err := waitForSocket(unixSocketPath, 3*time.Second); err != nil {
+					return nil, fmt.Errorf("socket not ready: %w", err)
 				}
-				return pType.GrpcClient(client), nil
+
+				return pType.GrpcClient(unixSocketPath), nil
 			})
 			pType.Register(key, wrappedFunc)
 		}
 	}
 	return nil
 }
-
 
 func forkChild(pluginPath string, config map[string]string) (int, int, error) {
 	sp, err := syscall.Socketpair(syscall.AF_LOCAL, syscall.SOCK_STREAM, syscall.AF_UNSPEC)
