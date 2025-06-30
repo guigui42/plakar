@@ -46,6 +46,8 @@ import (
 )
 
 func init() {
+	subcommands.Register(func() subcommands.Subcommand { return &AgentTasksShow{} },
+		subcommands.AgentSupport|subcommands.BeforeRepositoryOpen, "agent", "tasks", "show")
 	subcommands.Register(func() subcommands.Subcommand { return &AgentTasksConfigure{} },
 		subcommands.AgentSupport|subcommands.BeforeRepositoryOpen, "agent", "tasks", "configure")
 	subcommands.Register(func() subcommands.Subcommand { return &AgentTasksStart{} },

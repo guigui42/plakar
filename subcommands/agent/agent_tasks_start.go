@@ -4,8 +4,8 @@ import (
 	"flag"
 	"fmt"
 
-	"github.com/PlakarKorp/plakar/appcontext"
 	"github.com/PlakarKorp/kloset/repository"
+	"github.com/PlakarKorp/plakar/appcontext"
 	"github.com/PlakarKorp/plakar/scheduler"
 	"github.com/PlakarKorp/plakar/subcommands"
 )
@@ -47,7 +47,7 @@ func (cmd *AgentTasksStart) Execute(ctx *appcontext.AppContext, repo *repository
 
 	// this needs to execute in the agent context, not the client context
 	agentContextSingleton.schedulerCtx = appcontext.NewAppContextFrom(agentContextSingleton.agentCtx)
-	go scheduler.NewScheduler(agentContextSingleton.schedulerCtx, agentContextSingleton.schedulerConfig).Run()
+	go scheduler.NewAgentScheduler(agentContextSingleton.schedulerCtx, agentContextSingleton.schedulerConfig).Run()
 
 	agentContextSingleton.schedulerState = AGENT_SCHEDULER_RUNNING
 	return 0, nil

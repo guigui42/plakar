@@ -1,4 +1,5 @@
 GO =		go
+GOYACC =	~/go/bin/goyacc
 
 DESTDIR =
 PREFIX =	/usr/local
@@ -11,7 +12,7 @@ INSTALL_MAN =	${INSTALL} -m 0444
 
 all: plakar
 
-plakar:
+plakar: scheduler/configparser/grammar.go
 	${GO} build -v .
 
 install:
@@ -20,6 +21,9 @@ install:
 	${INSTALL_PROGRAM} plakar ${DESTDIR}${BINDIR}
 	find cmd/plakar -iname \*.1 -exec \
 		${INSTALL_MAN} {} ${DESTDIR}${MANDIR}/man1 \;
+
+scheduler/configparser/grammar.go: scheduler/configparser/grammar.y
+	${GOYACC} -o scheduler/configparser/grammar.go scheduler/configparser/grammar.y
 
 check: test
 test:

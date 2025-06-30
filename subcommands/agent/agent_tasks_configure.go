@@ -5,8 +5,8 @@ import (
 	"fmt"
 	"path/filepath"
 
-	"github.com/PlakarKorp/plakar/appcontext"
 	"github.com/PlakarKorp/kloset/repository"
+	"github.com/PlakarKorp/plakar/appcontext"
 	"github.com/PlakarKorp/plakar/scheduler"
 	"github.com/PlakarKorp/plakar/subcommands"
 )
@@ -48,7 +48,7 @@ func (cmd *AgentTasksConfigure) Execute(ctx *appcontext.AppContext, repo *reposi
 		return 1, fmt.Errorf("agent not started")
 	}
 
-	schedConfig, err := scheduler.ParseConfigFile(cmd.ConfigurationFile)
+	schedConfig, err := ParseConfigFile(cmd.ConfigurationFile)
 	if err != nil {
 		return 1, err
 	}
@@ -61,7 +61,7 @@ func (cmd *AgentTasksConfigure) Execute(ctx *appcontext.AppContext, repo *reposi
 		agentContextSingleton.schedulerCtx.Cancel()
 		agentContextSingleton.schedulerCtx = appcontext.NewAppContextFrom(agentContextSingleton.agentCtx)
 
-		go scheduler.NewScheduler(agentContextSingleton.schedulerCtx, schedConfig).Run()
+		go scheduler.NewAgentScheduler(agentContextSingleton.schedulerCtx, schedConfig).Run()
 
 		fmt.Fprintf(ctx.Stderr, "done !\n")
 	}

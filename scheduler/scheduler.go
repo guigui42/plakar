@@ -4,73 +4,94 @@ import (
 	"sync"
 	"time"
 
-	"github.com/PlakarKorp/kloset/repository"
 	"github.com/PlakarKorp/plakar/appcontext"
-	"github.com/PlakarKorp/plakar/reporting"
-	"github.com/PlakarKorp/plakar/services"
 )
 
-type Scheduler struct {
+type Schedule interface {
+	WithDateMask(DateMask) Schedule
+	PlanForDate(time.Time) []time.Time
+	String() string
+}
+
+type AgentScheduler struct {
 	config *Configuration
 	ctx    *appcontext.AppContext
 	wg     sync.WaitGroup
+	sched  *Scheduler[*ScheduledJob]
 }
 
-func stringToDuration(s string) (time.Duration, error) {
-	d, err := time.ParseDuration(s)
-	if err != nil {
-		return 0, err
-	}
-	return d, nil
-}
-
-func NewScheduler(ctx *appcontext.AppContext, config *Configuration) *Scheduler {
-	return &Scheduler{
+func NewAgentScheduler(ctx *appcontext.AppContext, config *Configuration) *AgentScheduler {
+	return &AgentScheduler{
 		ctx:    ctx,
 		config: config,
 		wg:     sync.WaitGroup{},
 	}
 }
 
-func (s *Scheduler) Run() {
-	for _, cleanupCfg := range s.config.Agent.Maintenance {
-		go s.maintenanceTask(cleanupCfg)
+func (s *AgentScheduler) Run() {
+	runq := make(chan *ScheduledJob, 1000)
+	s.sched = NewScheduler(runq)
+
+	stopped, err := s.sched.Start()
+	if err != nil {
+		s.ctx.GetLogger().Error("failed to start scheduler: %v", err)
+		return
 	}
 
-	for _, tasksetCfg := range s.config.Agent.Tasks {
-		if tasksetCfg.Backup != nil {
-			go s.backupTask(tasksetCfg, *tasksetCfg.Backup)
-		}
-
-		for _, checkCfg := range tasksetCfg.Check {
-			go s.checkTask(tasksetCfg, checkCfg)
-		}
-
-		for _, restoreCfg := range tasksetCfg.Restore {
-			go s.restoreTask(tasksetCfg, restoreCfg)
-		}
-
-		for _, syncCfg := range tasksetCfg.Sync {
-			go s.syncTask(tasksetCfg, syncCfg)
-		}
+	scheduleq := make(chan time.Time, 1)
+	sched := NewScheduler(scheduleq)
+	_, err = sched.Start()
+	if err != nil {
+		s.ctx.GetLogger().Error("failed to start scheduler: %v", err)
+		return
 	}
+
+	t0 := time.Now()
+	s.ScheduleForDate(t0)
+	sched.ScheduleAt(t0, t0)
+	go func() {
+		for {
+			select {
+			case t := <-scheduleq:
+				t = s.NextDay(t)
+				s.ScheduleForDate(t)
+				sched.ScheduleAt(t, t)
+			case <-s.ctx.Done():
+				sched.Stop()
+				s.sched.Stop()
+			case <-stopped:
+				goto out
+			case job := <-runq:
+				job.Execute(s.ctx)
+			}
+		}
+	out:
+	}()
 }
 
-func (s *Scheduler) NewTaskReporter(ctx *appcontext.AppContext, repo *repository.Repository, taskType, taskName, repoName string) *reporting.Reporter {
-	doReport := true
-	authToken, err := s.ctx.GetAuthToken(repo.Configuration().RepositoryID)
-	if err != nil || authToken == "" {
-		doReport = false
-	} else {
-		sc := services.NewServiceConnector(s.ctx, authToken)
-		enabled, err := sc.GetServiceStatus("alerting")
-		if err != nil || !enabled {
-			doReport = false
+func (s *AgentScheduler) NextDay(date time.Time) time.Time {
+	year, month, day := date.Date()
+	r := time.Date(year, month, day, 0, 0, 0, 0, date.Location())
+	return r.AddDate(0, 0, 1)
+}
+
+func (s *AgentScheduler) ScheduleForDate(date time.Time) {
+	s.ctx.GetLogger().Debug("scheduling jobs for %v", date)
+	for name, job := range s.config.Jobs {
+		for _, schedule := range job.Schedules {
+			plan := schedule.PlanForDate(date)
+			for _, t := range plan {
+				if t.Before(date) {
+					s.ctx.GetLogger().Debug("job %q: ignore for past time %v", name, t)
+					continue
+				}
+				s.ctx.GetLogger().Debug("job %q: scheduled for %v", name, t)
+				sj := &ScheduledJob{
+					scheduled: t,
+					job:       job,
+				}
+				sj.event = s.sched.ScheduleAt(sj, t)
+			}
 		}
 	}
-	reporter := reporting.NewReporter(ctx, doReport, repo, s.ctx.GetLogger())
-	reporter.TaskStart(taskType, taskName)
-	reporter.WithRepositoryName(repoName)
-	reporter.WithRepository(repo)
-	return reporter
 }
