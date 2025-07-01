@@ -5,11 +5,22 @@ package importer;
 import "google/protobuf/timestamp.proto";
 
 service Importer {
+  rpc Init(InitRequest) returns (InitResponse);
   rpc Info(InfoRequest) returns (InfoResponse);
   rpc Scan(ScanRequest) returns (stream ScanResponse);
   rpc OpenReader(OpenReaderRequest) returns (stream OpenReaderResponse);
   rpc CloseReader(CloseReaderRequest) returns (CloseReaderResponse);
   rpc Close(CloseRequest) returns (CloseResponse);
+}
+
+message InitRequest {
+  // importer options here = 1;
+  string proto = 2;
+  map<string, string> config = 3;
+}
+
+message InitResponse {
+  optional string error = 1;
 }
 
 message InfoRequest {
