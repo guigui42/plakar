@@ -9,6 +9,7 @@ import (
 
 	"github.com/PlakarKorp/kloset/objects"
 	"github.com/PlakarKorp/kloset/snapshot/importer"
+	"google.golang.org/grpc"
 
 	grpc_importer_pkg "github.com/PlakarKorp/plakar/connectors/grpc/importer/pkg"
 )
@@ -17,6 +18,30 @@ type GrpcImporter struct {
 	GrpcClientScan   grpc_importer_pkg.ImporterClient
 	GrpcClientReader grpc_importer_pkg.ImporterClient
 	Ctx              context.Context
+}
+
+func NewImporter(client grpc.ClientConnInterface, ctx context.Context, opts *importer.Options, proto string, config map[string]string) (importer.Importer, error) {
+	importer := &GrpcImporter{
+		GrpcClientScan:   grpc_importer_pkg.NewImporterClient(client),
+		GrpcClientReader: grpc_importer_pkg.NewImporterClient(client),
+		Ctx:              ctx,
+	}
+
+	initReq := grpc_importer_pkg.InitRequest{
+		Proto:  proto,
+		Config: config,
+	}
+
+	res, err := importer.GrpcClientScan.Init(ctx, &initReq)
+	if err != nil {
+		return nil, err
+	}
+
+	if res.Error != nil {
+		return nil, fmt.Errorf("%s", *res.Error)
+	}
+
+	return importer, nil
 }
 
 func (g *GrpcImporter) Origin() string {
