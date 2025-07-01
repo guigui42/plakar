@@ -129,7 +129,7 @@ func (parser *ConfigParser) Error(s string) {
 }
 
 var (
-	CHARS_SPACES     = []byte("\r\t ")
+	CHARS_SPACES     = []byte("\r\n\t ")
 	CHARS_SEPARATORS = []byte(",;")
 
 	SUFFIX_TIME     = []string{"am", "pm"}
@@ -196,6 +196,7 @@ func (parser *ConfigParser) next() byte {
 	}
 
 	if len(parser.buf) <= parser.pos {
+		parser.pos++
 		return 0
 	}
 
@@ -209,9 +210,11 @@ func (parser *ConfigParser) next() byte {
 
 func (parser *ConfigParser) back() {
 	parser.pos--
-	b := parser.buf[parser.pos]
-	if b == '\n' {
-		parser.lineno--
+	if parser.pos < len(parser.buf) {
+		b := parser.buf[parser.pos]
+		if b == '\n' {
+			parser.lineno--
+		}
 	}
 }
 
@@ -231,14 +234,6 @@ func (parser *ConfigParser) Lex(lval *yySymType) int {
 		case b == '#':
 			parser.skipComment()
 			continue
-		case b == '\\':
-			// We just want to ignore the next newline
-			n := parser.next()
-			if n == '\n' {
-				continue
-			}
-			parser.back()
-			return int(n)
 		case isSpace(b):
 			parser.skipSpace()
 			continue

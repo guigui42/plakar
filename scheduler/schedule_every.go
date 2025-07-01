@@ -43,11 +43,11 @@ func (s *ScheduleEvery) String() string {
 	b.WriteString("every ")
 	b.WriteString(s.Period.String())
 	if s.From != -1 {
-		b.WriteByte(' ')
+		b.WriteString("from ")
 		b.WriteString(s.From.String())
 	}
 	if s.Until != -1 {
-		b.WriteByte(' ')
+		b.WriteString("until ")
 		b.WriteString(s.Until.String())
 	}
 	b.WriteByte(' ')

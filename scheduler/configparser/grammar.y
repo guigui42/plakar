@@ -74,13 +74,8 @@ func Parser(lexer yyLexer) *ConfigParser {
 %%
 
 grammar:
-| grammar '\n'
-| grammar reporting '\n'
-| grammar job '\n'
-;
-
-optnl:
-| optnl '\n'
+| grammar reporting
+| grammar job
 ;
 
 reporting:
@@ -88,12 +83,12 @@ reporting:
 ;
 
 job:
-  JOB STRING optnl task optnl schedule_list {
+  JOB STRING task schedule_list {
     if Parser(yylex).HasJob($2) {
        Parser(yylex).Error(fmt.Sprintf("job %q already defined", $2))
 	 goto ret1
     }
-    Parser(yylex).PushJob($2, $4, $6)
+    Parser(yylex).PushJob($2, $3, $4)
 }
 ;
 
