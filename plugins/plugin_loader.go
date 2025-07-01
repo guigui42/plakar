@@ -21,7 +21,6 @@ import (
 	grpc_exporter "github.com/PlakarKorp/plakar/connectors/grpc/exporter"
 	grpc_exporter_pkg "github.com/PlakarKorp/plakar/connectors/grpc/exporter/pkg"
 	grpc_importer "github.com/PlakarKorp/plakar/connectors/grpc/importer"
-	grpc_importer_pkg "github.com/PlakarKorp/plakar/connectors/grpc/importer/pkg"
 	grpc_storage "github.com/PlakarKorp/plakar/connectors/grpc/storage"
 	grpc_storage_pkg "github.com/PlakarKorp/plakar/connectors/grpc/storage/pkg"
 	"github.com/PlakarKorp/plakar/utils"
@@ -127,11 +126,7 @@ func Load(ctx *appcontext.AppContext, pluginsDir, cacheDir, name string) error {
 						return nil, fmt.Errorf("failed to connect to plugin: %w", err)
 					}
 
-					return &grpc_importer.GrpcImporter{
-						GrpcClientScan:   grpc_importer_pkg.NewImporterClient(client),
-						GrpcClientReader: grpc_importer_pkg.NewImporterClient(client),
-						Ctx:              ctx,
-					}, nil
+					return grpc_importer.NewImporter(client, ctx, o, s, config)
 				})
 			case "exporter":
 				exporter.Register(proto, flags, func(ctx context.Context, o *exporter.Options, s string, config map[string]string) (exporter.Exporter, error) {
