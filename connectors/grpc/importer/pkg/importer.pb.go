@@ -71,18 +71,94 @@ func (ExtendedAttributeType) EnumDescriptor() ([]byte, []int) {
 	return file_importer_proto_rawDescGZIP(), []int{0}
 }
 
+type Options struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Hostname       string                 `protobuf:"bytes,1,opt,name=hostname,proto3" json:"hostname,omitempty"`
+	Os             string                 `protobuf:"bytes,2,opt,name=os,proto3" json:"os,omitempty"`
+	Arch           string                 `protobuf:"bytes,3,opt,name=arch,proto3" json:"arch,omitempty"`
+	Cwd            string                 `protobuf:"bytes,4,opt,name=cwd,proto3" json:"cwd,omitempty"`
+	Maxconcurrency string                 `protobuf:"bytes,5,opt,name=maxconcurrency,proto3" json:"maxconcurrency,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *Options) Reset() {
+	*x = Options{}
+	mi := &file_importer_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Options) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Options) ProtoMessage() {}
+
+func (x *Options) ProtoReflect() protoreflect.Message {
+	mi := &file_importer_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Options.ProtoReflect.Descriptor instead.
+func (*Options) Descriptor() ([]byte, []int) {
+	return file_importer_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *Options) GetHostname() string {
+	if x != nil {
+		return x.Hostname
+	}
+	return ""
+}
+
+func (x *Options) GetOs() string {
+	if x != nil {
+		return x.Os
+	}
+	return ""
+}
+
+func (x *Options) GetArch() string {
+	if x != nil {
+		return x.Arch
+	}
+	return ""
+}
+
+func (x *Options) GetCwd() string {
+	if x != nil {
+		return x.Cwd
+	}
+	return ""
+}
+
+func (x *Options) GetMaxconcurrency() string {
+	if x != nil {
+		return x.Maxconcurrency
+	}
+	return ""
+}
+
 type InitRequest struct {
-	state protoimpl.MessageState `protogen:"open.v1"`
-	// importer options here = 1;
-	Proto         string            `protobuf:"bytes,2,opt,name=proto,proto3" json:"proto,omitempty"`
-	Config        map[string]string `protobuf:"bytes,3,rep,name=config,proto3" json:"config,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Options       *Options               `protobuf:"bytes,1,opt,name=options,proto3" json:"options,omitempty"`
+	Proto         string                 `protobuf:"bytes,2,opt,name=proto,proto3" json:"proto,omitempty"`
+	Config        map[string]string      `protobuf:"bytes,3,rep,name=config,proto3" json:"config,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *InitRequest) Reset() {
 	*x = InitRequest{}
-	mi := &file_importer_proto_msgTypes[0]
+	mi := &file_importer_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -94,7 +170,7 @@ func (x *InitRequest) String() string {
 func (*InitRequest) ProtoMessage() {}
 
 func (x *InitRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_importer_proto_msgTypes[0]
+	mi := &file_importer_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -107,7 +183,14 @@ func (x *InitRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InitRequest.ProtoReflect.Descriptor instead.
 func (*InitRequest) Descriptor() ([]byte, []int) {
-	return file_importer_proto_rawDescGZIP(), []int{0}
+	return file_importer_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *InitRequest) GetOptions() *Options {
+	if x != nil {
+		return x.Options
+	}
+	return nil
 }
 
 func (x *InitRequest) GetProto() string {
@@ -133,7 +216,7 @@ type InitResponse struct {
 
 func (x *InitResponse) Reset() {
 	*x = InitResponse{}
-	mi := &file_importer_proto_msgTypes[1]
+	mi := &file_importer_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -145,7 +228,7 @@ func (x *InitResponse) String() string {
 func (*InitResponse) ProtoMessage() {}
 
 func (x *InitResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_importer_proto_msgTypes[1]
+	mi := &file_importer_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -158,7 +241,7 @@ func (x *InitResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InitResponse.ProtoReflect.Descriptor instead.
 func (*InitResponse) Descriptor() ([]byte, []int) {
-	return file_importer_proto_rawDescGZIP(), []int{1}
+	return file_importer_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *InitResponse) GetError() string {
@@ -176,7 +259,7 @@ type InfoRequest struct {
 
 func (x *InfoRequest) Reset() {
 	*x = InfoRequest{}
-	mi := &file_importer_proto_msgTypes[2]
+	mi := &file_importer_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -188,7 +271,7 @@ func (x *InfoRequest) String() string {
 func (*InfoRequest) ProtoMessage() {}
 
 func (x *InfoRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_importer_proto_msgTypes[2]
+	mi := &file_importer_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -201,7 +284,7 @@ func (x *InfoRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InfoRequest.ProtoReflect.Descriptor instead.
 func (*InfoRequest) Descriptor() ([]byte, []int) {
-	return file_importer_proto_rawDescGZIP(), []int{2}
+	return file_importer_proto_rawDescGZIP(), []int{3}
 }
 
 type InfoResponse struct {
@@ -215,7 +298,7 @@ type InfoResponse struct {
 
 func (x *InfoResponse) Reset() {
 	*x = InfoResponse{}
-	mi := &file_importer_proto_msgTypes[3]
+	mi := &file_importer_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -227,7 +310,7 @@ func (x *InfoResponse) String() string {
 func (*InfoResponse) ProtoMessage() {}
 
 func (x *InfoResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_importer_proto_msgTypes[3]
+	mi := &file_importer_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -240,7 +323,7 @@ func (x *InfoResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use InfoResponse.ProtoReflect.Descriptor instead.
 func (*InfoResponse) Descriptor() ([]byte, []int) {
-	return file_importer_proto_rawDescGZIP(), []int{3}
+	return file_importer_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *InfoResponse) GetType() string {
@@ -272,7 +355,7 @@ type ScanRequest struct {
 
 func (x *ScanRequest) Reset() {
 	*x = ScanRequest{}
-	mi := &file_importer_proto_msgTypes[4]
+	mi := &file_importer_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -284,7 +367,7 @@ func (x *ScanRequest) String() string {
 func (*ScanRequest) ProtoMessage() {}
 
 func (x *ScanRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_importer_proto_msgTypes[4]
+	mi := &file_importer_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -297,7 +380,7 @@ func (x *ScanRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ScanRequest.ProtoReflect.Descriptor instead.
 func (*ScanRequest) Descriptor() ([]byte, []int) {
-	return file_importer_proto_rawDescGZIP(), []int{4}
+	return file_importer_proto_rawDescGZIP(), []int{5}
 }
 
 type ScanResponse struct {
@@ -314,7 +397,7 @@ type ScanResponse struct {
 
 func (x *ScanResponse) Reset() {
 	*x = ScanResponse{}
-	mi := &file_importer_proto_msgTypes[5]
+	mi := &file_importer_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -326,7 +409,7 @@ func (x *ScanResponse) String() string {
 func (*ScanResponse) ProtoMessage() {}
 
 func (x *ScanResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_importer_proto_msgTypes[5]
+	mi := &file_importer_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -339,7 +422,7 @@ func (x *ScanResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ScanResponse.ProtoReflect.Descriptor instead.
 func (*ScanResponse) Descriptor() ([]byte, []int) {
-	return file_importer_proto_rawDescGZIP(), []int{5}
+	return file_importer_proto_rawDescGZIP(), []int{6}
 }
 
 func (x *ScanResponse) GetPathname() string {
@@ -399,7 +482,7 @@ type ScanError struct {
 
 func (x *ScanError) Reset() {
 	*x = ScanError{}
-	mi := &file_importer_proto_msgTypes[6]
+	mi := &file_importer_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -411,7 +494,7 @@ func (x *ScanError) String() string {
 func (*ScanError) ProtoMessage() {}
 
 func (x *ScanError) ProtoReflect() protoreflect.Message {
-	mi := &file_importer_proto_msgTypes[6]
+	mi := &file_importer_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -424,7 +507,7 @@ func (x *ScanError) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ScanError.ProtoReflect.Descriptor instead.
 func (*ScanError) Descriptor() ([]byte, []int) {
-	return file_importer_proto_rawDescGZIP(), []int{6}
+	return file_importer_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *ScanError) GetMessage() string {
@@ -446,7 +529,7 @@ type ScanRecord struct {
 
 func (x *ScanRecord) Reset() {
 	*x = ScanRecord{}
-	mi := &file_importer_proto_msgTypes[7]
+	mi := &file_importer_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -458,7 +541,7 @@ func (x *ScanRecord) String() string {
 func (*ScanRecord) ProtoMessage() {}
 
 func (x *ScanRecord) ProtoReflect() protoreflect.Message {
-	mi := &file_importer_proto_msgTypes[7]
+	mi := &file_importer_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -471,7 +554,7 @@ func (x *ScanRecord) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ScanRecord.ProtoReflect.Descriptor instead.
 func (*ScanRecord) Descriptor() ([]byte, []int) {
-	return file_importer_proto_rawDescGZIP(), []int{7}
+	return file_importer_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *ScanRecord) GetTarget() string {
@@ -510,7 +593,7 @@ type EOFResponse struct {
 
 func (x *EOFResponse) Reset() {
 	*x = EOFResponse{}
-	mi := &file_importer_proto_msgTypes[8]
+	mi := &file_importer_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -522,7 +605,7 @@ func (x *EOFResponse) String() string {
 func (*EOFResponse) ProtoMessage() {}
 
 func (x *EOFResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_importer_proto_msgTypes[8]
+	mi := &file_importer_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -535,7 +618,7 @@ func (x *EOFResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use EOFResponse.ProtoReflect.Descriptor instead.
 func (*EOFResponse) Descriptor() ([]byte, []int) {
-	return file_importer_proto_rawDescGZIP(), []int{8}
+	return file_importer_proto_rawDescGZIP(), []int{9}
 }
 
 type ExtendedAttribute struct {
@@ -548,7 +631,7 @@ type ExtendedAttribute struct {
 
 func (x *ExtendedAttribute) Reset() {
 	*x = ExtendedAttribute{}
-	mi := &file_importer_proto_msgTypes[9]
+	mi := &file_importer_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -560,7 +643,7 @@ func (x *ExtendedAttribute) String() string {
 func (*ExtendedAttribute) ProtoMessage() {}
 
 func (x *ExtendedAttribute) ProtoReflect() protoreflect.Message {
-	mi := &file_importer_proto_msgTypes[9]
+	mi := &file_importer_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -573,7 +656,7 @@ func (x *ExtendedAttribute) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ExtendedAttribute.ProtoReflect.Descriptor instead.
 func (*ExtendedAttribute) Descriptor() ([]byte, []int) {
-	return file_importer_proto_rawDescGZIP(), []int{9}
+	return file_importer_proto_rawDescGZIP(), []int{10}
 }
 
 func (x *ExtendedAttribute) GetName() string {
@@ -610,7 +693,7 @@ type ScanRecordFileInfo struct {
 
 func (x *ScanRecordFileInfo) Reset() {
 	*x = ScanRecordFileInfo{}
-	mi := &file_importer_proto_msgTypes[10]
+	mi := &file_importer_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -622,7 +705,7 @@ func (x *ScanRecordFileInfo) String() string {
 func (*ScanRecordFileInfo) ProtoMessage() {}
 
 func (x *ScanRecordFileInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_importer_proto_msgTypes[10]
+	mi := &file_importer_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -635,7 +718,7 @@ func (x *ScanRecordFileInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ScanRecordFileInfo.ProtoReflect.Descriptor instead.
 func (*ScanRecordFileInfo) Descriptor() ([]byte, []int) {
-	return file_importer_proto_rawDescGZIP(), []int{10}
+	return file_importer_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *ScanRecordFileInfo) GetName() string {
@@ -732,7 +815,7 @@ type ScanResponseError struct {
 
 func (x *ScanResponseError) Reset() {
 	*x = ScanResponseError{}
-	mi := &file_importer_proto_msgTypes[11]
+	mi := &file_importer_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -744,7 +827,7 @@ func (x *ScanResponseError) String() string {
 func (*ScanResponseError) ProtoMessage() {}
 
 func (x *ScanResponseError) ProtoReflect() protoreflect.Message {
-	mi := &file_importer_proto_msgTypes[11]
+	mi := &file_importer_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -757,7 +840,7 @@ func (x *ScanResponseError) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ScanResponseError.ProtoReflect.Descriptor instead.
 func (*ScanResponseError) Descriptor() ([]byte, []int) {
-	return file_importer_proto_rawDescGZIP(), []int{11}
+	return file_importer_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *ScanResponseError) GetName() string {
@@ -783,7 +866,7 @@ type OpenReaderRequest struct {
 
 func (x *OpenReaderRequest) Reset() {
 	*x = OpenReaderRequest{}
-	mi := &file_importer_proto_msgTypes[12]
+	mi := &file_importer_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -795,7 +878,7 @@ func (x *OpenReaderRequest) String() string {
 func (*OpenReaderRequest) ProtoMessage() {}
 
 func (x *OpenReaderRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_importer_proto_msgTypes[12]
+	mi := &file_importer_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -808,7 +891,7 @@ func (x *OpenReaderRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use OpenReaderRequest.ProtoReflect.Descriptor instead.
 func (*OpenReaderRequest) Descriptor() ([]byte, []int) {
-	return file_importer_proto_rawDescGZIP(), []int{12}
+	return file_importer_proto_rawDescGZIP(), []int{13}
 }
 
 func (x *OpenReaderRequest) GetPathname() string {
@@ -827,7 +910,7 @@ type OpenReaderResponse struct {
 
 func (x *OpenReaderResponse) Reset() {
 	*x = OpenReaderResponse{}
-	mi := &file_importer_proto_msgTypes[13]
+	mi := &file_importer_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -839,7 +922,7 @@ func (x *OpenReaderResponse) String() string {
 func (*OpenReaderResponse) ProtoMessage() {}
 
 func (x *OpenReaderResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_importer_proto_msgTypes[13]
+	mi := &file_importer_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -852,7 +935,7 @@ func (x *OpenReaderResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use OpenReaderResponse.ProtoReflect.Descriptor instead.
 func (*OpenReaderResponse) Descriptor() ([]byte, []int) {
-	return file_importer_proto_rawDescGZIP(), []int{13}
+	return file_importer_proto_rawDescGZIP(), []int{14}
 }
 
 func (x *OpenReaderResponse) GetChunk() []byte {
@@ -871,7 +954,7 @@ type CloseReaderRequest struct {
 
 func (x *CloseReaderRequest) Reset() {
 	*x = CloseReaderRequest{}
-	mi := &file_importer_proto_msgTypes[14]
+	mi := &file_importer_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -883,7 +966,7 @@ func (x *CloseReaderRequest) String() string {
 func (*CloseReaderRequest) ProtoMessage() {}
 
 func (x *CloseReaderRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_importer_proto_msgTypes[14]
+	mi := &file_importer_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -896,7 +979,7 @@ func (x *CloseReaderRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CloseReaderRequest.ProtoReflect.Descriptor instead.
 func (*CloseReaderRequest) Descriptor() ([]byte, []int) {
-	return file_importer_proto_rawDescGZIP(), []int{14}
+	return file_importer_proto_rawDescGZIP(), []int{15}
 }
 
 func (x *CloseReaderRequest) GetPathname() string {
@@ -914,7 +997,7 @@ type CloseReaderResponse struct {
 
 func (x *CloseReaderResponse) Reset() {
 	*x = CloseReaderResponse{}
-	mi := &file_importer_proto_msgTypes[15]
+	mi := &file_importer_proto_msgTypes[16]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -926,7 +1009,7 @@ func (x *CloseReaderResponse) String() string {
 func (*CloseReaderResponse) ProtoMessage() {}
 
 func (x *CloseReaderResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_importer_proto_msgTypes[15]
+	mi := &file_importer_proto_msgTypes[16]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -939,7 +1022,7 @@ func (x *CloseReaderResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CloseReaderResponse.ProtoReflect.Descriptor instead.
 func (*CloseReaderResponse) Descriptor() ([]byte, []int) {
-	return file_importer_proto_rawDescGZIP(), []int{15}
+	return file_importer_proto_rawDescGZIP(), []int{16}
 }
 
 type CloseRequest struct {
@@ -950,7 +1033,7 @@ type CloseRequest struct {
 
 func (x *CloseRequest) Reset() {
 	*x = CloseRequest{}
-	mi := &file_importer_proto_msgTypes[16]
+	mi := &file_importer_proto_msgTypes[17]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -962,7 +1045,7 @@ func (x *CloseRequest) String() string {
 func (*CloseRequest) ProtoMessage() {}
 
 func (x *CloseRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_importer_proto_msgTypes[16]
+	mi := &file_importer_proto_msgTypes[17]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -975,7 +1058,7 @@ func (x *CloseRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CloseRequest.ProtoReflect.Descriptor instead.
 func (*CloseRequest) Descriptor() ([]byte, []int) {
-	return file_importer_proto_rawDescGZIP(), []int{16}
+	return file_importer_proto_rawDescGZIP(), []int{17}
 }
 
 type CloseResponse struct {
@@ -986,7 +1069,7 @@ type CloseResponse struct {
 
 func (x *CloseResponse) Reset() {
 	*x = CloseResponse{}
-	mi := &file_importer_proto_msgTypes[17]
+	mi := &file_importer_proto_msgTypes[18]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -998,7 +1081,7 @@ func (x *CloseResponse) String() string {
 func (*CloseResponse) ProtoMessage() {}
 
 func (x *CloseResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_importer_proto_msgTypes[17]
+	mi := &file_importer_proto_msgTypes[18]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -1011,15 +1094,22 @@ func (x *CloseResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CloseResponse.ProtoReflect.Descriptor instead.
 func (*CloseResponse) Descriptor() ([]byte, []int) {
-	return file_importer_proto_rawDescGZIP(), []int{17}
+	return file_importer_proto_rawDescGZIP(), []int{18}
 }
 
 var File_importer_proto protoreflect.FileDescriptor
 
 const file_importer_proto_rawDesc = "" +
 	"\n" +
-	"\x0eimporter.proto\x12\bimporter\x1a\x1fgoogle/protobuf/timestamp.proto\"\x99\x01\n" +
-	"\vInitRequest\x12\x14\n" +
+	"\x0eimporter.proto\x12\bimporter\x1a\x1fgoogle/protobuf/timestamp.proto\"\x83\x01\n" +
+	"\aOptions\x12\x1a\n" +
+	"\bhostname\x18\x01 \x01(\tR\bhostname\x12\x0e\n" +
+	"\x02os\x18\x02 \x01(\tR\x02os\x12\x12\n" +
+	"\x04arch\x18\x03 \x01(\tR\x04arch\x12\x10\n" +
+	"\x03cwd\x18\x04 \x01(\tR\x03cwd\x12&\n" +
+	"\x0emaxconcurrency\x18\x05 \x01(\tR\x0emaxconcurrency\"\xc6\x01\n" +
+	"\vInitRequest\x12+\n" +
+	"\aoptions\x18\x01 \x01(\v2\x11.importer.OptionsR\aoptions\x12\x14\n" +
 	"\x05proto\x18\x02 \x01(\tR\x05proto\x129\n" +
 	"\x06config\x18\x03 \x03(\v2!.importer.InitRequest.ConfigEntryR\x06config\x1a9\n" +
 	"\vConfigEntry\x12\x10\n" +
@@ -1104,55 +1194,57 @@ func file_importer_proto_rawDescGZIP() []byte {
 }
 
 var file_importer_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_importer_proto_msgTypes = make([]protoimpl.MessageInfo, 19)
+var file_importer_proto_msgTypes = make([]protoimpl.MessageInfo, 20)
 var file_importer_proto_goTypes = []any{
 	(ExtendedAttributeType)(0),    // 0: importer.ExtendedAttributeType
-	(*InitRequest)(nil),           // 1: importer.InitRequest
-	(*InitResponse)(nil),          // 2: importer.InitResponse
-	(*InfoRequest)(nil),           // 3: importer.InfoRequest
-	(*InfoResponse)(nil),          // 4: importer.InfoResponse
-	(*ScanRequest)(nil),           // 5: importer.ScanRequest
-	(*ScanResponse)(nil),          // 6: importer.ScanResponse
-	(*ScanError)(nil),             // 7: importer.ScanError
-	(*ScanRecord)(nil),            // 8: importer.ScanRecord
-	(*EOFResponse)(nil),           // 9: importer.EOFResponse
-	(*ExtendedAttribute)(nil),     // 10: importer.ExtendedAttribute
-	(*ScanRecordFileInfo)(nil),    // 11: importer.ScanRecordFileInfo
-	(*ScanResponseError)(nil),     // 12: importer.ScanResponseError
-	(*OpenReaderRequest)(nil),     // 13: importer.OpenReaderRequest
-	(*OpenReaderResponse)(nil),    // 14: importer.OpenReaderResponse
-	(*CloseReaderRequest)(nil),    // 15: importer.CloseReaderRequest
-	(*CloseReaderResponse)(nil),   // 16: importer.CloseReaderResponse
-	(*CloseRequest)(nil),          // 17: importer.CloseRequest
-	(*CloseResponse)(nil),         // 18: importer.CloseResponse
-	nil,                           // 19: importer.InitRequest.ConfigEntry
-	(*timestamppb.Timestamp)(nil), // 20: google.protobuf.Timestamp
+	(*Options)(nil),               // 1: importer.Options
+	(*InitRequest)(nil),           // 2: importer.InitRequest
+	(*InitResponse)(nil),          // 3: importer.InitResponse
+	(*InfoRequest)(nil),           // 4: importer.InfoRequest
+	(*InfoResponse)(nil),          // 5: importer.InfoResponse
+	(*ScanRequest)(nil),           // 6: importer.ScanRequest
+	(*ScanResponse)(nil),          // 7: importer.ScanResponse
+	(*ScanError)(nil),             // 8: importer.ScanError
+	(*ScanRecord)(nil),            // 9: importer.ScanRecord
+	(*EOFResponse)(nil),           // 10: importer.EOFResponse
+	(*ExtendedAttribute)(nil),     // 11: importer.ExtendedAttribute
+	(*ScanRecordFileInfo)(nil),    // 12: importer.ScanRecordFileInfo
+	(*ScanResponseError)(nil),     // 13: importer.ScanResponseError
+	(*OpenReaderRequest)(nil),     // 14: importer.OpenReaderRequest
+	(*OpenReaderResponse)(nil),    // 15: importer.OpenReaderResponse
+	(*CloseReaderRequest)(nil),    // 16: importer.CloseReaderRequest
+	(*CloseReaderResponse)(nil),   // 17: importer.CloseReaderResponse
+	(*CloseRequest)(nil),          // 18: importer.CloseRequest
+	(*CloseResponse)(nil),         // 19: importer.CloseResponse
+	nil,                           // 20: importer.InitRequest.ConfigEntry
+	(*timestamppb.Timestamp)(nil), // 21: google.protobuf.Timestamp
 }
 var file_importer_proto_depIdxs = []int32{
-	19, // 0: importer.InitRequest.config:type_name -> importer.InitRequest.ConfigEntry
-	7,  // 1: importer.ScanResponse.error:type_name -> importer.ScanError
-	8,  // 2: importer.ScanResponse.record:type_name -> importer.ScanRecord
-	11, // 3: importer.ScanRecord.fileinfo:type_name -> importer.ScanRecordFileInfo
-	10, // 4: importer.ScanRecord.xattr:type_name -> importer.ExtendedAttribute
-	0,  // 5: importer.ExtendedAttribute.type:type_name -> importer.ExtendedAttributeType
-	20, // 6: importer.ScanRecordFileInfo.mod_time:type_name -> google.protobuf.Timestamp
-	1,  // 7: importer.Importer.Init:input_type -> importer.InitRequest
-	3,  // 8: importer.Importer.Info:input_type -> importer.InfoRequest
-	5,  // 9: importer.Importer.Scan:input_type -> importer.ScanRequest
-	13, // 10: importer.Importer.OpenReader:input_type -> importer.OpenReaderRequest
-	15, // 11: importer.Importer.CloseReader:input_type -> importer.CloseReaderRequest
-	17, // 12: importer.Importer.Close:input_type -> importer.CloseRequest
-	2,  // 13: importer.Importer.Init:output_type -> importer.InitResponse
-	4,  // 14: importer.Importer.Info:output_type -> importer.InfoResponse
-	6,  // 15: importer.Importer.Scan:output_type -> importer.ScanResponse
-	14, // 16: importer.Importer.OpenReader:output_type -> importer.OpenReaderResponse
-	16, // 17: importer.Importer.CloseReader:output_type -> importer.CloseReaderResponse
-	18, // 18: importer.Importer.Close:output_type -> importer.CloseResponse
-	13, // [13:19] is the sub-list for method output_type
-	7,  // [7:13] is the sub-list for method input_type
-	7,  // [7:7] is the sub-list for extension type_name
-	7,  // [7:7] is the sub-list for extension extendee
-	0,  // [0:7] is the sub-list for field type_name
+	1,  // 0: importer.InitRequest.options:type_name -> importer.Options
+	20, // 1: importer.InitRequest.config:type_name -> importer.InitRequest.ConfigEntry
+	8,  // 2: importer.ScanResponse.error:type_name -> importer.ScanError
+	9,  // 3: importer.ScanResponse.record:type_name -> importer.ScanRecord
+	12, // 4: importer.ScanRecord.fileinfo:type_name -> importer.ScanRecordFileInfo
+	11, // 5: importer.ScanRecord.xattr:type_name -> importer.ExtendedAttribute
+	0,  // 6: importer.ExtendedAttribute.type:type_name -> importer.ExtendedAttributeType
+	21, // 7: importer.ScanRecordFileInfo.mod_time:type_name -> google.protobuf.Timestamp
+	2,  // 8: importer.Importer.Init:input_type -> importer.InitRequest
+	4,  // 9: importer.Importer.Info:input_type -> importer.InfoRequest
+	6,  // 10: importer.Importer.Scan:input_type -> importer.ScanRequest
+	14, // 11: importer.Importer.OpenReader:input_type -> importer.OpenReaderRequest
+	16, // 12: importer.Importer.CloseReader:input_type -> importer.CloseReaderRequest
+	18, // 13: importer.Importer.Close:input_type -> importer.CloseRequest
+	3,  // 14: importer.Importer.Init:output_type -> importer.InitResponse
+	5,  // 15: importer.Importer.Info:output_type -> importer.InfoResponse
+	7,  // 16: importer.Importer.Scan:output_type -> importer.ScanResponse
+	15, // 17: importer.Importer.OpenReader:output_type -> importer.OpenReaderResponse
+	17, // 18: importer.Importer.CloseReader:output_type -> importer.CloseReaderResponse
+	19, // 19: importer.Importer.Close:output_type -> importer.CloseResponse
+	14, // [14:20] is the sub-list for method output_type
+	8,  // [8:14] is the sub-list for method input_type
+	8,  // [8:8] is the sub-list for extension type_name
+	8,  // [8:8] is the sub-list for extension extendee
+	0,  // [0:8] is the sub-list for field type_name
 }
 
 func init() { file_importer_proto_init() }
@@ -1160,19 +1252,19 @@ func file_importer_proto_init() {
 	if File_importer_proto != nil {
 		return
 	}
-	file_importer_proto_msgTypes[1].OneofWrappers = []any{}
-	file_importer_proto_msgTypes[5].OneofWrappers = []any{
+	file_importer_proto_msgTypes[2].OneofWrappers = []any{}
+	file_importer_proto_msgTypes[6].OneofWrappers = []any{
 		(*ScanResponse_Error)(nil),
 		(*ScanResponse_Record)(nil),
 	}
-	file_importer_proto_msgTypes[7].OneofWrappers = []any{}
+	file_importer_proto_msgTypes[8].OneofWrappers = []any{}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_importer_proto_rawDesc), len(file_importer_proto_rawDesc)),
 			NumEnums:      1,
-			NumMessages:   19,
+			NumMessages:   20,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
