@@ -22,6 +22,146 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+type Options struct {
+	state          protoimpl.MessageState `protogen:"open.v1"`
+	Maxconcurrency int64                  `protobuf:"varint,1,opt,name=maxconcurrency,proto3" json:"maxconcurrency,omitempty"`
+	unknownFields  protoimpl.UnknownFields
+	sizeCache      protoimpl.SizeCache
+}
+
+func (x *Options) Reset() {
+	*x = Options{}
+	mi := &file_exporter_proto_msgTypes[0]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *Options) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*Options) ProtoMessage() {}
+
+func (x *Options) ProtoReflect() protoreflect.Message {
+	mi := &file_exporter_proto_msgTypes[0]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use Options.ProtoReflect.Descriptor instead.
+func (*Options) Descriptor() ([]byte, []int) {
+	return file_exporter_proto_rawDescGZIP(), []int{0}
+}
+
+func (x *Options) GetMaxconcurrency() int64 {
+	if x != nil {
+		return x.Maxconcurrency
+	}
+	return 0
+}
+
+type InitRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Options       *Options               `protobuf:"bytes,1,opt,name=options,proto3" json:"options,omitempty"`
+	Proto         string                 `protobuf:"bytes,2,opt,name=proto,proto3" json:"proto,omitempty"`
+	Config        map[string]string      `protobuf:"bytes,3,rep,name=config,proto3" json:"config,omitempty" protobuf_key:"bytes,1,opt,name=key" protobuf_val:"bytes,2,opt,name=value"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *InitRequest) Reset() {
+	*x = InitRequest{}
+	mi := &file_exporter_proto_msgTypes[1]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *InitRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InitRequest) ProtoMessage() {}
+
+func (x *InitRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_exporter_proto_msgTypes[1]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InitRequest.ProtoReflect.Descriptor instead.
+func (*InitRequest) Descriptor() ([]byte, []int) {
+	return file_exporter_proto_rawDescGZIP(), []int{1}
+}
+
+func (x *InitRequest) GetOptions() *Options {
+	if x != nil {
+		return x.Options
+	}
+	return nil
+}
+
+func (x *InitRequest) GetProto() string {
+	if x != nil {
+		return x.Proto
+	}
+	return ""
+}
+
+func (x *InitRequest) GetConfig() map[string]string {
+	if x != nil {
+		return x.Config
+	}
+	return nil
+}
+
+type InitResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *InitResponse) Reset() {
+	*x = InitResponse{}
+	mi := &file_exporter_proto_msgTypes[2]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *InitResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InitResponse) ProtoMessage() {}
+
+func (x *InitResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_exporter_proto_msgTypes[2]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InitResponse.ProtoReflect.Descriptor instead.
+func (*InitResponse) Descriptor() ([]byte, []int) {
+	return file_exporter_proto_rawDescGZIP(), []int{2}
+}
+
 type RootRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -30,7 +170,7 @@ type RootRequest struct {
 
 func (x *RootRequest) Reset() {
 	*x = RootRequest{}
-	mi := &file_exporter_proto_msgTypes[0]
+	mi := &file_exporter_proto_msgTypes[3]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -42,7 +182,7 @@ func (x *RootRequest) String() string {
 func (*RootRequest) ProtoMessage() {}
 
 func (x *RootRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_exporter_proto_msgTypes[0]
+	mi := &file_exporter_proto_msgTypes[3]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -55,7 +195,7 @@ func (x *RootRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RootRequest.ProtoReflect.Descriptor instead.
 func (*RootRequest) Descriptor() ([]byte, []int) {
-	return file_exporter_proto_rawDescGZIP(), []int{0}
+	return file_exporter_proto_rawDescGZIP(), []int{3}
 }
 
 type RootResponse struct {
@@ -67,7 +207,7 @@ type RootResponse struct {
 
 func (x *RootResponse) Reset() {
 	*x = RootResponse{}
-	mi := &file_exporter_proto_msgTypes[1]
+	mi := &file_exporter_proto_msgTypes[4]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -79,7 +219,7 @@ func (x *RootResponse) String() string {
 func (*RootResponse) ProtoMessage() {}
 
 func (x *RootResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_exporter_proto_msgTypes[1]
+	mi := &file_exporter_proto_msgTypes[4]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -92,7 +232,7 @@ func (x *RootResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use RootResponse.ProtoReflect.Descriptor instead.
 func (*RootResponse) Descriptor() ([]byte, []int) {
-	return file_exporter_proto_rawDescGZIP(), []int{1}
+	return file_exporter_proto_rawDescGZIP(), []int{4}
 }
 
 func (x *RootResponse) GetRootPath() string {
@@ -111,7 +251,7 @@ type CreateDirectoryRequest struct {
 
 func (x *CreateDirectoryRequest) Reset() {
 	*x = CreateDirectoryRequest{}
-	mi := &file_exporter_proto_msgTypes[2]
+	mi := &file_exporter_proto_msgTypes[5]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -123,7 +263,7 @@ func (x *CreateDirectoryRequest) String() string {
 func (*CreateDirectoryRequest) ProtoMessage() {}
 
 func (x *CreateDirectoryRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_exporter_proto_msgTypes[2]
+	mi := &file_exporter_proto_msgTypes[5]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -136,7 +276,7 @@ func (x *CreateDirectoryRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateDirectoryRequest.ProtoReflect.Descriptor instead.
 func (*CreateDirectoryRequest) Descriptor() ([]byte, []int) {
-	return file_exporter_proto_rawDescGZIP(), []int{2}
+	return file_exporter_proto_rawDescGZIP(), []int{5}
 }
 
 func (x *CreateDirectoryRequest) GetPathname() string {
@@ -154,7 +294,7 @@ type CreateDirectoryResponse struct {
 
 func (x *CreateDirectoryResponse) Reset() {
 	*x = CreateDirectoryResponse{}
-	mi := &file_exporter_proto_msgTypes[3]
+	mi := &file_exporter_proto_msgTypes[6]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -166,7 +306,7 @@ func (x *CreateDirectoryResponse) String() string {
 func (*CreateDirectoryResponse) ProtoMessage() {}
 
 func (x *CreateDirectoryResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_exporter_proto_msgTypes[3]
+	mi := &file_exporter_proto_msgTypes[6]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -179,7 +319,7 @@ func (x *CreateDirectoryResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CreateDirectoryResponse.ProtoReflect.Descriptor instead.
 func (*CreateDirectoryResponse) Descriptor() ([]byte, []int) {
-	return file_exporter_proto_rawDescGZIP(), []int{3}
+	return file_exporter_proto_rawDescGZIP(), []int{6}
 }
 
 type StoreFileRequest struct {
@@ -195,7 +335,7 @@ type StoreFileRequest struct {
 
 func (x *StoreFileRequest) Reset() {
 	*x = StoreFileRequest{}
-	mi := &file_exporter_proto_msgTypes[4]
+	mi := &file_exporter_proto_msgTypes[7]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -207,7 +347,7 @@ func (x *StoreFileRequest) String() string {
 func (*StoreFileRequest) ProtoMessage() {}
 
 func (x *StoreFileRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_exporter_proto_msgTypes[4]
+	mi := &file_exporter_proto_msgTypes[7]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -220,7 +360,7 @@ func (x *StoreFileRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StoreFileRequest.ProtoReflect.Descriptor instead.
 func (*StoreFileRequest) Descriptor() ([]byte, []int) {
-	return file_exporter_proto_rawDescGZIP(), []int{4}
+	return file_exporter_proto_rawDescGZIP(), []int{7}
 }
 
 func (x *StoreFileRequest) GetType() isStoreFileRequest_Type {
@@ -274,7 +414,7 @@ type Header struct {
 
 func (x *Header) Reset() {
 	*x = Header{}
-	mi := &file_exporter_proto_msgTypes[5]
+	mi := &file_exporter_proto_msgTypes[8]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -286,7 +426,7 @@ func (x *Header) String() string {
 func (*Header) ProtoMessage() {}
 
 func (x *Header) ProtoReflect() protoreflect.Message {
-	mi := &file_exporter_proto_msgTypes[5]
+	mi := &file_exporter_proto_msgTypes[8]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -299,7 +439,7 @@ func (x *Header) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Header.ProtoReflect.Descriptor instead.
 func (*Header) Descriptor() ([]byte, []int) {
-	return file_exporter_proto_rawDescGZIP(), []int{5}
+	return file_exporter_proto_rawDescGZIP(), []int{8}
 }
 
 func (x *Header) GetPathname() string {
@@ -325,7 +465,7 @@ type Data struct {
 
 func (x *Data) Reset() {
 	*x = Data{}
-	mi := &file_exporter_proto_msgTypes[6]
+	mi := &file_exporter_proto_msgTypes[9]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -337,7 +477,7 @@ func (x *Data) String() string {
 func (*Data) ProtoMessage() {}
 
 func (x *Data) ProtoReflect() protoreflect.Message {
-	mi := &file_exporter_proto_msgTypes[6]
+	mi := &file_exporter_proto_msgTypes[9]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -350,7 +490,7 @@ func (x *Data) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use Data.ProtoReflect.Descriptor instead.
 func (*Data) Descriptor() ([]byte, []int) {
-	return file_exporter_proto_rawDescGZIP(), []int{6}
+	return file_exporter_proto_rawDescGZIP(), []int{9}
 }
 
 func (x *Data) GetChunk() []byte {
@@ -368,7 +508,7 @@ type StoreFileResponse struct {
 
 func (x *StoreFileResponse) Reset() {
 	*x = StoreFileResponse{}
-	mi := &file_exporter_proto_msgTypes[7]
+	mi := &file_exporter_proto_msgTypes[10]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -380,7 +520,7 @@ func (x *StoreFileResponse) String() string {
 func (*StoreFileResponse) ProtoMessage() {}
 
 func (x *StoreFileResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_exporter_proto_msgTypes[7]
+	mi := &file_exporter_proto_msgTypes[10]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -393,7 +533,7 @@ func (x *StoreFileResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StoreFileResponse.ProtoReflect.Descriptor instead.
 func (*StoreFileResponse) Descriptor() ([]byte, []int) {
-	return file_exporter_proto_rawDescGZIP(), []int{7}
+	return file_exporter_proto_rawDescGZIP(), []int{10}
 }
 
 type FileInfo struct {
@@ -416,7 +556,7 @@ type FileInfo struct {
 
 func (x *FileInfo) Reset() {
 	*x = FileInfo{}
-	mi := &file_exporter_proto_msgTypes[8]
+	mi := &file_exporter_proto_msgTypes[11]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -428,7 +568,7 @@ func (x *FileInfo) String() string {
 func (*FileInfo) ProtoMessage() {}
 
 func (x *FileInfo) ProtoReflect() protoreflect.Message {
-	mi := &file_exporter_proto_msgTypes[8]
+	mi := &file_exporter_proto_msgTypes[11]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -441,7 +581,7 @@ func (x *FileInfo) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use FileInfo.ProtoReflect.Descriptor instead.
 func (*FileInfo) Descriptor() ([]byte, []int) {
-	return file_exporter_proto_rawDescGZIP(), []int{8}
+	return file_exporter_proto_rawDescGZIP(), []int{11}
 }
 
 func (x *FileInfo) GetName() string {
@@ -538,7 +678,7 @@ type SetPermissionsRequest struct {
 
 func (x *SetPermissionsRequest) Reset() {
 	*x = SetPermissionsRequest{}
-	mi := &file_exporter_proto_msgTypes[9]
+	mi := &file_exporter_proto_msgTypes[12]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -550,7 +690,7 @@ func (x *SetPermissionsRequest) String() string {
 func (*SetPermissionsRequest) ProtoMessage() {}
 
 func (x *SetPermissionsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_exporter_proto_msgTypes[9]
+	mi := &file_exporter_proto_msgTypes[12]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -563,7 +703,7 @@ func (x *SetPermissionsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetPermissionsRequest.ProtoReflect.Descriptor instead.
 func (*SetPermissionsRequest) Descriptor() ([]byte, []int) {
-	return file_exporter_proto_rawDescGZIP(), []int{9}
+	return file_exporter_proto_rawDescGZIP(), []int{12}
 }
 
 func (x *SetPermissionsRequest) GetPathname() string {
@@ -588,7 +728,7 @@ type SetPermissionsResponse struct {
 
 func (x *SetPermissionsResponse) Reset() {
 	*x = SetPermissionsResponse{}
-	mi := &file_exporter_proto_msgTypes[10]
+	mi := &file_exporter_proto_msgTypes[13]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -600,7 +740,7 @@ func (x *SetPermissionsResponse) String() string {
 func (*SetPermissionsResponse) ProtoMessage() {}
 
 func (x *SetPermissionsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_exporter_proto_msgTypes[10]
+	mi := &file_exporter_proto_msgTypes[13]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -613,7 +753,7 @@ func (x *SetPermissionsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SetPermissionsResponse.ProtoReflect.Descriptor instead.
 func (*SetPermissionsResponse) Descriptor() ([]byte, []int) {
-	return file_exporter_proto_rawDescGZIP(), []int{10}
+	return file_exporter_proto_rawDescGZIP(), []int{13}
 }
 
 type CloseRequest struct {
@@ -624,7 +764,7 @@ type CloseRequest struct {
 
 func (x *CloseRequest) Reset() {
 	*x = CloseRequest{}
-	mi := &file_exporter_proto_msgTypes[11]
+	mi := &file_exporter_proto_msgTypes[14]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -636,7 +776,7 @@ func (x *CloseRequest) String() string {
 func (*CloseRequest) ProtoMessage() {}
 
 func (x *CloseRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_exporter_proto_msgTypes[11]
+	mi := &file_exporter_proto_msgTypes[14]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -649,7 +789,7 @@ func (x *CloseRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CloseRequest.ProtoReflect.Descriptor instead.
 func (*CloseRequest) Descriptor() ([]byte, []int) {
-	return file_exporter_proto_rawDescGZIP(), []int{11}
+	return file_exporter_proto_rawDescGZIP(), []int{14}
 }
 
 type CloseResponse struct {
@@ -660,7 +800,7 @@ type CloseResponse struct {
 
 func (x *CloseResponse) Reset() {
 	*x = CloseResponse{}
-	mi := &file_exporter_proto_msgTypes[12]
+	mi := &file_exporter_proto_msgTypes[15]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -672,7 +812,7 @@ func (x *CloseResponse) String() string {
 func (*CloseResponse) ProtoMessage() {}
 
 func (x *CloseResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_exporter_proto_msgTypes[12]
+	mi := &file_exporter_proto_msgTypes[15]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -685,14 +825,24 @@ func (x *CloseResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use CloseResponse.ProtoReflect.Descriptor instead.
 func (*CloseResponse) Descriptor() ([]byte, []int) {
-	return file_exporter_proto_rawDescGZIP(), []int{12}
+	return file_exporter_proto_rawDescGZIP(), []int{15}
 }
 
 var File_exporter_proto protoreflect.FileDescriptor
 
 const file_exporter_proto_rawDesc = "" +
 	"\n" +
-	"\x0eexporter.proto\x12\bexporter\x1a\x1fgoogle/protobuf/timestamp.proto\"\r\n" +
+	"\x0eexporter.proto\x12\bexporter\x1a\x1fgoogle/protobuf/timestamp.proto\"1\n" +
+	"\aOptions\x12&\n" +
+	"\x0emaxconcurrency\x18\x01 \x01(\x03R\x0emaxconcurrency\"\xc6\x01\n" +
+	"\vInitRequest\x12+\n" +
+	"\aoptions\x18\x01 \x01(\v2\x11.exporter.OptionsR\aoptions\x12\x14\n" +
+	"\x05proto\x18\x02 \x01(\tR\x05proto\x129\n" +
+	"\x06config\x18\x03 \x03(\v2!.exporter.InitRequest.ConfigEntryR\x06config\x1a9\n" +
+	"\vConfigEntry\x12\x10\n" +
+	"\x03key\x18\x01 \x01(\tR\x03key\x12\x14\n" +
+	"\x05value\x18\x02 \x01(\tR\x05value:\x028\x01\"\x0e\n" +
+	"\fInitResponse\"\r\n" +
 	"\vRootRequest\"+\n" +
 	"\fRootResponse\x12\x1b\n" +
 	"\troot_path\x18\x01 \x01(\tR\brootPath\"4\n" +
@@ -728,8 +878,9 @@ const file_exporter_proto_rawDesc = "" +
 	"\tfile_info\x18\x02 \x01(\v2\x12.exporter.FileInfoR\bfileInfo\"\x18\n" +
 	"\x16SetPermissionsResponse\"\x0e\n" +
 	"\fCloseRequest\"\x0f\n" +
-	"\rCloseResponse2\xf0\x02\n" +
+	"\rCloseResponse2\xa7\x03\n" +
 	"\bExporter\x125\n" +
+	"\x04Init\x12\x15.exporter.InitRequest\x1a\x16.exporter.InitResponse\x125\n" +
 	"\x04Root\x12\x15.exporter.RootRequest\x1a\x16.exporter.RootResponse\x12V\n" +
 	"\x0fCreateDirectory\x12 .exporter.CreateDirectoryRequest\x1a!.exporter.CreateDirectoryResponse\x12F\n" +
 	"\tStoreFile\x12\x1a.exporter.StoreFileRequest\x1a\x1b.exporter.StoreFileResponse(\x01\x12S\n" +
@@ -748,43 +899,51 @@ func file_exporter_proto_rawDescGZIP() []byte {
 	return file_exporter_proto_rawDescData
 }
 
-var file_exporter_proto_msgTypes = make([]protoimpl.MessageInfo, 13)
+var file_exporter_proto_msgTypes = make([]protoimpl.MessageInfo, 17)
 var file_exporter_proto_goTypes = []any{
-	(*RootRequest)(nil),             // 0: exporter.RootRequest
-	(*RootResponse)(nil),            // 1: exporter.RootResponse
-	(*CreateDirectoryRequest)(nil),  // 2: exporter.CreateDirectoryRequest
-	(*CreateDirectoryResponse)(nil), // 3: exporter.CreateDirectoryResponse
-	(*StoreFileRequest)(nil),        // 4: exporter.StoreFileRequest
-	(*Header)(nil),                  // 5: exporter.Header
-	(*Data)(nil),                    // 6: exporter.Data
-	(*StoreFileResponse)(nil),       // 7: exporter.StoreFileResponse
-	(*FileInfo)(nil),                // 8: exporter.FileInfo
-	(*SetPermissionsRequest)(nil),   // 9: exporter.SetPermissionsRequest
-	(*SetPermissionsResponse)(nil),  // 10: exporter.SetPermissionsResponse
-	(*CloseRequest)(nil),            // 11: exporter.CloseRequest
-	(*CloseResponse)(nil),           // 12: exporter.CloseResponse
-	(*timestamppb.Timestamp)(nil),   // 13: google.protobuf.Timestamp
+	(*Options)(nil),                 // 0: exporter.Options
+	(*InitRequest)(nil),             // 1: exporter.InitRequest
+	(*InitResponse)(nil),            // 2: exporter.InitResponse
+	(*RootRequest)(nil),             // 3: exporter.RootRequest
+	(*RootResponse)(nil),            // 4: exporter.RootResponse
+	(*CreateDirectoryRequest)(nil),  // 5: exporter.CreateDirectoryRequest
+	(*CreateDirectoryResponse)(nil), // 6: exporter.CreateDirectoryResponse
+	(*StoreFileRequest)(nil),        // 7: exporter.StoreFileRequest
+	(*Header)(nil),                  // 8: exporter.Header
+	(*Data)(nil),                    // 9: exporter.Data
+	(*StoreFileResponse)(nil),       // 10: exporter.StoreFileResponse
+	(*FileInfo)(nil),                // 11: exporter.FileInfo
+	(*SetPermissionsRequest)(nil),   // 12: exporter.SetPermissionsRequest
+	(*SetPermissionsResponse)(nil),  // 13: exporter.SetPermissionsResponse
+	(*CloseRequest)(nil),            // 14: exporter.CloseRequest
+	(*CloseResponse)(nil),           // 15: exporter.CloseResponse
+	nil,                             // 16: exporter.InitRequest.ConfigEntry
+	(*timestamppb.Timestamp)(nil),   // 17: google.protobuf.Timestamp
 }
 var file_exporter_proto_depIdxs = []int32{
-	5,  // 0: exporter.StoreFileRequest.header:type_name -> exporter.Header
-	6,  // 1: exporter.StoreFileRequest.data:type_name -> exporter.Data
-	13, // 2: exporter.FileInfo.mod_time:type_name -> google.protobuf.Timestamp
-	8,  // 3: exporter.SetPermissionsRequest.file_info:type_name -> exporter.FileInfo
-	0,  // 4: exporter.Exporter.Root:input_type -> exporter.RootRequest
-	2,  // 5: exporter.Exporter.CreateDirectory:input_type -> exporter.CreateDirectoryRequest
-	4,  // 6: exporter.Exporter.StoreFile:input_type -> exporter.StoreFileRequest
-	9,  // 7: exporter.Exporter.SetPermissions:input_type -> exporter.SetPermissionsRequest
-	11, // 8: exporter.Exporter.Close:input_type -> exporter.CloseRequest
-	1,  // 9: exporter.Exporter.Root:output_type -> exporter.RootResponse
-	3,  // 10: exporter.Exporter.CreateDirectory:output_type -> exporter.CreateDirectoryResponse
-	7,  // 11: exporter.Exporter.StoreFile:output_type -> exporter.StoreFileResponse
-	10, // 12: exporter.Exporter.SetPermissions:output_type -> exporter.SetPermissionsResponse
-	12, // 13: exporter.Exporter.Close:output_type -> exporter.CloseResponse
-	9,  // [9:14] is the sub-list for method output_type
-	4,  // [4:9] is the sub-list for method input_type
-	4,  // [4:4] is the sub-list for extension type_name
-	4,  // [4:4] is the sub-list for extension extendee
-	0,  // [0:4] is the sub-list for field type_name
+	0,  // 0: exporter.InitRequest.options:type_name -> exporter.Options
+	16, // 1: exporter.InitRequest.config:type_name -> exporter.InitRequest.ConfigEntry
+	8,  // 2: exporter.StoreFileRequest.header:type_name -> exporter.Header
+	9,  // 3: exporter.StoreFileRequest.data:type_name -> exporter.Data
+	17, // 4: exporter.FileInfo.mod_time:type_name -> google.protobuf.Timestamp
+	11, // 5: exporter.SetPermissionsRequest.file_info:type_name -> exporter.FileInfo
+	1,  // 6: exporter.Exporter.Init:input_type -> exporter.InitRequest
+	3,  // 7: exporter.Exporter.Root:input_type -> exporter.RootRequest
+	5,  // 8: exporter.Exporter.CreateDirectory:input_type -> exporter.CreateDirectoryRequest
+	7,  // 9: exporter.Exporter.StoreFile:input_type -> exporter.StoreFileRequest
+	12, // 10: exporter.Exporter.SetPermissions:input_type -> exporter.SetPermissionsRequest
+	14, // 11: exporter.Exporter.Close:input_type -> exporter.CloseRequest
+	2,  // 12: exporter.Exporter.Init:output_type -> exporter.InitResponse
+	4,  // 13: exporter.Exporter.Root:output_type -> exporter.RootResponse
+	6,  // 14: exporter.Exporter.CreateDirectory:output_type -> exporter.CreateDirectoryResponse
+	10, // 15: exporter.Exporter.StoreFile:output_type -> exporter.StoreFileResponse
+	13, // 16: exporter.Exporter.SetPermissions:output_type -> exporter.SetPermissionsResponse
+	15, // 17: exporter.Exporter.Close:output_type -> exporter.CloseResponse
+	12, // [12:18] is the sub-list for method output_type
+	6,  // [6:12] is the sub-list for method input_type
+	6,  // [6:6] is the sub-list for extension type_name
+	6,  // [6:6] is the sub-list for extension extendee
+	0,  // [0:6] is the sub-list for field type_name
 }
 
 func init() { file_exporter_proto_init() }
@@ -792,7 +951,7 @@ func file_exporter_proto_init() {
 	if File_exporter_proto != nil {
 		return
 	}
-	file_exporter_proto_msgTypes[4].OneofWrappers = []any{
+	file_exporter_proto_msgTypes[7].OneofWrappers = []any{
 		(*StoreFileRequest_Header)(nil),
 		(*StoreFileRequest_Data)(nil),
 	}
@@ -802,7 +961,7 @@ func file_exporter_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_exporter_proto_rawDesc), len(file_exporter_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   13,
+			NumMessages:   17,
 			NumExtensions: 0,
 			NumServices:   1,
 		},

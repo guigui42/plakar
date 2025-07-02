@@ -19,6 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
+	Exporter_Init_FullMethodName            = "/exporter.Exporter/Init"
 	Exporter_Root_FullMethodName            = "/exporter.Exporter/Root"
 	Exporter_CreateDirectory_FullMethodName = "/exporter.Exporter/CreateDirectory"
 	Exporter_StoreFile_FullMethodName       = "/exporter.Exporter/StoreFile"
@@ -30,6 +31,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type ExporterClient interface {
+	Init(ctx context.Context, in *InitRequest, opts ...grpc.CallOption) (*InitResponse, error)
 	Root(ctx context.Context, in *RootRequest, opts ...grpc.CallOption) (*RootResponse, error)
 	CreateDirectory(ctx context.Context, in *CreateDirectoryRequest, opts ...grpc.CallOption) (*CreateDirectoryResponse, error)
 	StoreFile(ctx context.Context, opts ...grpc.CallOption) (grpc.ClientStreamingClient[StoreFileRequest, StoreFileResponse], error)
@@ -43,6 +45,16 @@ type exporterClient struct {
 
 func NewExporterClient(cc grpc.ClientConnInterface) ExporterClient {
 	return &exporterClient{cc}
+}
+
+func (c *exporterClient) Init(ctx context.Context, in *InitRequest, opts ...grpc.CallOption) (*InitResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(InitResponse)
+	err := c.cc.Invoke(ctx, Exporter_Init_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *exporterClient) Root(ctx context.Context, in *RootRequest, opts ...grpc.CallOption) (*RootResponse, error) {
@@ -102,6 +114,7 @@ func (c *exporterClient) Close(ctx context.Context, in *CloseRequest, opts ...gr
 // All implementations must embed UnimplementedExporterServer
 // for forward compatibility.
 type ExporterServer interface {
+	Init(context.Context, *InitRequest) (*InitResponse, error)
 	Root(context.Context, *RootRequest) (*RootResponse, error)
 	CreateDirectory(context.Context, *CreateDirectoryRequest) (*CreateDirectoryResponse, error)
 	StoreFile(grpc.ClientStreamingServer[StoreFileRequest, StoreFileResponse]) error
@@ -117,6 +130,9 @@ type ExporterServer interface {
 // pointer dereference when methods are called.
 type UnimplementedExporterServer struct{}
 
+func (UnimplementedExporterServer) Init(context.Context, *InitRequest) (*InitResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Init not implemented")
+}
 func (UnimplementedExporterServer) Root(context.Context, *RootRequest) (*RootResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Root not implemented")
 }
@@ -151,6 +167,24 @@ func RegisterExporterServer(s grpc.ServiceRegistrar, srv ExporterServer) {
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&Exporter_ServiceDesc, srv)
+}
+
+func _Exporter_Init_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InitRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(ExporterServer).Init(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Exporter_Init_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(ExporterServer).Init(ctx, req.(*InitRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Exporter_Root_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -239,6 +273,10 @@ var Exporter_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "exporter.Exporter",
 	HandlerType: (*ExporterServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Init",
+			Handler:    _Exporter_Init_Handler,
+		},
 		{
 			MethodName: "Root",
 			Handler:    _Exporter_Root_Handler,

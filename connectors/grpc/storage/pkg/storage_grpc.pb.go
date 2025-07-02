@@ -19,6 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
+	Store_Init_FullMethodName            = "/store.Store/Init"
 	Store_Create_FullMethodName          = "/store.Store/Create"
 	Store_Open_FullMethodName            = "/store.Store/Open"
 	Store_Close_FullMethodName           = "/store.Store/Close"
@@ -44,6 +45,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type StoreClient interface {
+	Init(ctx context.Context, in *InitRequest, opts ...grpc.CallOption) (*InitResponse, error)
 	Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error)
 	Open(ctx context.Context, in *OpenRequest, opts ...grpc.CallOption) (*OpenResponse, error)
 	Close(ctx context.Context, in *CloseRequest, opts ...grpc.CallOption) (*CloseResponse, error)
@@ -71,6 +73,16 @@ type storeClient struct {
 
 func NewStoreClient(cc grpc.ClientConnInterface) StoreClient {
 	return &storeClient{cc}
+}
+
+func (c *storeClient) Init(ctx context.Context, in *InitRequest, opts ...grpc.CallOption) (*InitResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(InitResponse)
+	err := c.cc.Invoke(ctx, Store_Init_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
 }
 
 func (c *storeClient) Create(ctx context.Context, in *CreateRequest, opts ...grpc.CallOption) (*CreateResponse, error) {
@@ -312,6 +324,7 @@ func (c *storeClient) DeleteLock(ctx context.Context, in *DeleteLockRequest, opt
 // All implementations must embed UnimplementedStoreServer
 // for forward compatibility.
 type StoreServer interface {
+	Init(context.Context, *InitRequest) (*InitResponse, error)
 	Create(context.Context, *CreateRequest) (*CreateResponse, error)
 	Open(context.Context, *OpenRequest) (*OpenResponse, error)
 	Close(context.Context, *CloseRequest) (*CloseResponse, error)
@@ -341,6 +354,9 @@ type StoreServer interface {
 // pointer dereference when methods are called.
 type UnimplementedStoreServer struct{}
 
+func (UnimplementedStoreServer) Init(context.Context, *InitRequest) (*InitResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method Init not implemented")
+}
 func (UnimplementedStoreServer) Create(context.Context, *CreateRequest) (*CreateResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method Create not implemented")
 }
@@ -417,6 +433,24 @@ func RegisterStoreServer(s grpc.ServiceRegistrar, srv StoreServer) {
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&Store_ServiceDesc, srv)
+}
+
+func _Store_Init_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(InitRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(StoreServer).Init(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: Store_Init_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(StoreServer).Init(ctx, req.(*InitRequest))
+	}
+	return interceptor(ctx, in, info, handler)
 }
 
 func _Store_Create_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -707,6 +741,10 @@ var Store_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "store.Store",
 	HandlerType: (*StoreServer)(nil),
 	Methods: []grpc.MethodDesc{
+		{
+			MethodName: "Init",
+			Handler:    _Store_Init_Handler,
+		},
 		{
 			MethodName: "Create",
 			Handler:    _Store_Create_Handler,
