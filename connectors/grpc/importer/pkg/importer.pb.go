@@ -77,7 +77,7 @@ type Options struct {
 	Os             string                 `protobuf:"bytes,2,opt,name=os,proto3" json:"os,omitempty"`
 	Arch           string                 `protobuf:"bytes,3,opt,name=arch,proto3" json:"arch,omitempty"`
 	Cwd            string                 `protobuf:"bytes,4,opt,name=cwd,proto3" json:"cwd,omitempty"`
-	Maxconcurrency string                 `protobuf:"bytes,5,opt,name=maxconcurrency,proto3" json:"maxconcurrency,omitempty"`
+	Maxconcurrency int64                  `protobuf:"varint,5,opt,name=maxconcurrency,proto3" json:"maxconcurrency,omitempty"`
 	unknownFields  protoimpl.UnknownFields
 	sizeCache      protoimpl.SizeCache
 }
@@ -140,11 +140,11 @@ func (x *Options) GetCwd() string {
 	return ""
 }
 
-func (x *Options) GetMaxconcurrency() string {
+func (x *Options) GetMaxconcurrency() int64 {
 	if x != nil {
 		return x.Maxconcurrency
 	}
-	return ""
+	return 0
 }
 
 type InitRequest struct {
@@ -1107,7 +1107,7 @@ const file_importer_proto_rawDesc = "" +
 	"\x02os\x18\x02 \x01(\tR\x02os\x12\x12\n" +
 	"\x04arch\x18\x03 \x01(\tR\x04arch\x12\x10\n" +
 	"\x03cwd\x18\x04 \x01(\tR\x03cwd\x12&\n" +
-	"\x0emaxconcurrency\x18\x05 \x01(\tR\x0emaxconcurrency\"\xc6\x01\n" +
+	"\x0emaxconcurrency\x18\x05 \x01(\x03R\x0emaxconcurrency\"\xc6\x01\n" +
 	"\vInitRequest\x12+\n" +
 	"\aoptions\x18\x01 \x01(\v2\x11.importer.OptionsR\aoptions\x12\x14\n" +
 	"\x05proto\x18\x02 \x01(\tR\x05proto\x129\n" +
