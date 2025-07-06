@@ -25,7 +25,7 @@ RUN make plakar
 FROM alpine:latest
 
 # Install required runtime dependencies
-RUN apk add --no-cache ca-certificates tzdata bash
+RUN apk add --no-cache ca-certificates tzdata
 
 # Create non-root user for security
 RUN addgroup -g 1000 plakar && \
@@ -36,11 +36,6 @@ WORKDIR /app
 
 # Copy the binary from builder stage
 COPY --from=builder /app/plakar /usr/local/bin/plakar
-
-# Copy startup script
-COPY docker/start-plakar-ui.sh /usr/local/bin/start-plakar-ui.sh
-
-RUN chmod +x /usr/local/bin/start-plakar-ui.sh
 
 # Create data directory and set permissions
 RUN mkdir -p /data && chown plakar:plakar /data
@@ -61,4 +56,4 @@ HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
 
 # Default command to start the UI with agent
 # Users can override with custom arguments
-CMD ["/usr/local/bin/start-plakar-ui.sh", "-addr", "0.0.0.0:8080", "-no-spawn", "-no-auth"]
+CMD ["/usr/local/bin/plakar", "-no-agent", "ui", "-addr", "0.0.0.0:8080", "-no-spawn", "-no-auth"]
