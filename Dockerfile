@@ -54,6 +54,6 @@ ENV PLAKAR_PASSPHRASE=""
 HEALTHCHECK --interval=30s --timeout=10s --start-period=5s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:8080/ || exit 1
 
-# Default command to start the UI with agent
+# Default command to start the UI
 # Users can override with custom arguments
 CMD ["/usr/local/bin/plakar", "-no-agent", "ui", "-addr", "0.0.0.0:8080", "-no-spawn", "-no-auth"]
